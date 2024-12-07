@@ -7,7 +7,7 @@ public class PPU {
     private int[] _color = new int[] { 0x00FFFFFF, 0x00808080, 0x00404040, 0 }; // 調色板顏色
     private DrawingArea _drawingArea;
     private int[,] _frameBuffer = new int[Global.SCREEN_WIDTH, Global.SCREEN_HEIGHT];
-    private int _scanlineCounter;
+    private int _countCycles;
     private MMU _mmu;
 
     public PPU(ref MMU mmu, DrawingArea drawingArea) {
@@ -33,28 +33,28 @@ public class PPU {
     */
 
     public void Update(int cycles) {
-        _scanlineCounter += cycles;
+        _countCycles += cycles;
         byte currentMode = (byte)(_mmu.STAT & 0x3); // LCD 模式
 
         if (IsLCDEnabled(_mmu.LCDC)) {
             switch (currentMode) {
                 case 2: // OAM 掃描模式
-                    if (_scanlineCounter >= 80) {
+                    if (_countCycles >= 80) {
                         ChangeSTATMode(3, _mmu);
-                        _scanlineCounter -= 80;
+                        _countCycles -= 80;
                     }
                     break;
                 case 3: // VRAM 模式
-                    if (_scanlineCounter >= 172) {
+                    if (_countCycles >= 172) {
                         ChangeSTATMode(0, _mmu);
                         DrawScanLine(_mmu);
-                        _scanlineCounter -= 172;
+                        _countCycles -= 172;
                     }
                     break;
                 case 0: // HBLANK 模式
-                    if (_scanlineCounter >= 204) {
+                    if (_countCycles >= 204) {
                         _mmu.LY = (byte)(_mmu.LY + 1);
-                        _scanlineCounter -= 204;
+                        _countCycles -= 204;
 
                         if (_mmu.LY == Global.SCREEN_HEIGHT) {
                             ChangeSTATMode(1, _mmu);
@@ -66,9 +66,9 @@ public class PPU {
                     }
                     break;
                 case 1: // VBLANK 模式
-                    if (_scanlineCounter >= 456) {
+                    if (_countCycles >= 456) {
                         _mmu.LY = (byte)(_mmu.LY + 1);
-                        _scanlineCounter -= 456;
+                        _countCycles -= 456;
 
                         if (_mmu.LY > 153) {
                             ChangeSTATMode(2, _mmu);
@@ -87,7 +87,7 @@ public class PPU {
             }
         } 
         else {
-            _scanlineCounter = 0;
+            _countCycles = 0;
             _mmu.LY = 0;
             _mmu.STAT = (byte)(_mmu.STAT & ~0x3);
         }
