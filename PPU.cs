@@ -288,14 +288,4 @@ public class PPU {
             }
         }
     }
-
-    private bool IsLCDEnabled(byte LCDC) => IsBit(7, LCDC);
-
-    private ushort GetBGTileMapAddress(byte LCDC) => IsBit(3, LCDC) ? (ushort)0x9C00 : (ushort)0x9800;
-
-    private bool IsBit(int n, int v) => ((v >> n) & 1) == 1;
-
-    private u8 BitSet(u8 n, u8 v) => v |= (byte)(1 << n);
-
-    private u8 BitClear(int n, u8 v) => v &= (byte)~(1 << n);
 }
