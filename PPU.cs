@@ -34,10 +34,10 @@ public class PPU {
 
     public void Update(int cycles) {
         _countCycles += cycles;
-        byte currentMode = (byte)(_mmu.STAT & 0x3); // LCD 模式
 
         if (((_mmu.LCDC >> 7) & 1) == 1) {
-            switch (currentMode) {
+            u8 mode = (u8) (_mmu.STAT & 0b00000011);
+            switch (mode) {
                 case 2: // OAM 掃描模式
                     if (_countCycles >= 80) {
                         ChangeSTATMode(3, _mmu);
