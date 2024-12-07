@@ -206,9 +206,10 @@ public class PPU {
         }
     }
 
-    private void SpritesToBuffer() {
-        byte LY = _mmu.LY;
-        byte LCDC = _mmu.LCDC;
+    private void SpritesToBuffer() 
+    {
+        // byte LY = _mmu.LY;
+        // byte LCDC = _mmu.LCDC;
 
         for (int i = 0x9C; i >= 0; i -= 4) {
             int y = _mmu.ReadOAM(i) - 16;
@@ -216,11 +217,11 @@ public class PPU {
             byte tile = _mmu.ReadOAM(i + 2);
             byte attr = _mmu.ReadOAM(i + 3);
 
-            if ((LY >= y) && (LY < y + (IsBit(2, LCDC) ? 16 : 8))) {
+            if ((_mmu.LY >= y) && (_mmu.LY < y + (IsBit(2, _mmu.LCDC) ? 16 : 8))) {
                 byte palette = IsBit(4, attr) ? _mmu.OBP1 : _mmu.OBP0;
                 bool aboveBG = !IsBit(7, attr);
 
-                int tileRow = IsBit(6, attr) ? (IsBit(2, LCDC) ? 16 : 8) - 1 - (LY - y) : (LY - y);
+                int tileRow = IsBit(6, attr) ? (IsBit(2, _mmu.LCDC) ? 16 : 8) - 1 - (_mmu.LY - y) : (_mmu.LY - y);
 
                 ushort tileAddress = (ushort)(0x8000 + tile * 16 + tileRow * 2);
                 byte lo = _mmu.ReadVRAM(tileAddress);
@@ -235,9 +236,9 @@ public class PPU {
                         int drawX = x + p;
 
                         // 添加邊界檢查
-                        if (drawX >= 0 && drawX < Global.SCREEN_WIDTH && LY >= 0 && LY < Global.SCREEN_HEIGHT) {
-                            if (aboveBG || _frameBuffer[drawX, LY] == _color[0]) {
-                                _frameBuffer[drawX, LY] = _color[paletteIndex];
+                        if (drawX >= 0 && drawX < Global.SCREEN_WIDTH && _mmu.LY >= 0 && _mmu.LY < Global.SCREEN_HEIGHT) {
+                            if (aboveBG || _frameBuffer[drawX, _mmu.LY] == _color[0]) {
+                                _frameBuffer[drawX, _mmu.LY] = _color[paletteIndex];
                             }
                         }
                     }
