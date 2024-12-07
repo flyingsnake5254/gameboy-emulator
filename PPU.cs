@@ -52,7 +52,7 @@ public class PPU {
                     break;
                 case 0: // HBLANK 模式
                     if (_scanlineCounter >= 204) {
-                        mmu.SetLY((byte)(mmu.GetLY() + 1));
+                        mmu.LY = ((byte)(mmu.GetLY() + 1));
                         _scanlineCounter -= 204;
 
                         if (mmu.GetLY() == Global.SCREEN_HEIGHT) {
@@ -66,19 +66,19 @@ public class PPU {
                     break;
                 case 1: // VBLANK 模式
                     if (_scanlineCounter >= 456) {
-                        mmu.SetLY((byte)(mmu.GetLY() + 1));
+                        mmu.LY = ((byte)(mmu.GetLY() + 1));
                         _scanlineCounter -= 456;
 
                         if (mmu.GetLY() > 153) {
                             ChangeSTATMode(2, mmu);
-                            mmu.SetLY(0); // 重置掃描線
+                            mmu.LY = (0); // 重置掃描線
                         }
                     }
                     break;
             }
 
             // 設置 coincidence flag
-            if (mmu.GetLY() == mmu.GetLYC()) {
+            if (mmu.GetLY() == mmu.LYC) {
                 mmu.SetSTAT(BitSet(2, mmu.GetSTAT()));
                 if (IsBit(6, mmu.GetSTAT())) mmu.RequestInterrupt(1);
             } else {
@@ -87,7 +87,7 @@ public class PPU {
         } 
         else {
             _scanlineCounter = 0;
-            mmu.SetLY(0);
+            mmu.LY = (0);
             mmu.SetSTAT((byte)(mmu.GetSTAT() & ~0x3));
         }
     }
@@ -109,9 +109,9 @@ public class PPU {
     }
 
     private void RenderBG(MMU mmu) {
-        byte LY = mmu.GetLY();
-        byte SCY = mmu.GetSCY();
-        byte SCX = mmu.GetSCX();
+        byte LY = mmu.LY;
+        byte SCY = mmu.SCY;
+        byte SCX = mmu.SCX;
         ushort tileMapBase = GetBGTileMapAddress(mmu.GetLCDC());
         ushort tileDataBase = IsBit(4, mmu.GetLCDC()) ? (ushort)0x8000 : (ushort)0x8800;
 

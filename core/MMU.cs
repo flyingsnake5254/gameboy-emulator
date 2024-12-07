@@ -263,35 +263,6 @@ public class MMU
         return IO[0x44]; 
     }
 
-    public void SetLY(u8 value)
-    {
-        IO[0x44] = value;
-    }
-
-    public u8 GetLYC()
-    {
-        return IO[0x45]; 
-    }
-
-    public void SetLYC(u8 value)
-    {
-        IO[0x45] = value;
-    }
-
-    public u8 GetSCX()
-    {
-        return IO[0x43]; 
-    }
-
-    public void SetSCX(u8 value)
-    {
-        IO[0x43] = value;
-    }
-
-    public u8 GetSCY()
-    {
-        return IO[0x42]; 
-    }
 
 
     public u8 GetIE()
