@@ -1,11 +1,12 @@
 
 public class MMU
 {
-    private u8[] IO = new u8[0x80];
-    private u8[] VRAM = new u8[0x2000];
+    public u8[] IO = new u8[0xFF7F - 0xFF00 + 1];
+    public u8[] VRAM = new u8[0x9FFF - 0x8000 + 1];
+    public u8[] WRAM = new u8[0xDFFF - 0xC000 + 1];
     private u8[] WRAM0 = new u8[0x1000];
     private u8[] WRAM1 = new u8[0x1000];
-    private u8[] OAM = new u8[0xA0];
+    public u8[] OAM = new u8[0xFE9F - 0xFE00 + 1];
     private u8[] HRAM = new u8[0x80];
 
     private IMBC _mbc;
