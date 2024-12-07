@@ -20,6 +20,7 @@ public class Emulator
         _ppu = new PPU(drawingArea);
         _timer = new Timer(ref _mmu);
         _keyboard = keyboard; // 外部傳入的 Keyboard
+        _keyboard.Init(ref _mmu);
 
         _running = true;
         Task t = Task.Run(() => Run());
@@ -44,7 +45,7 @@ public class Emulator
                 _ppu.Update(ref _mmu, returnCycles);
 
                 // 更新鍵盤輸入
-                _keyboard.Update(ref _mmu);
+                _keyboard.Update();
 
                 // 中斷處理
                 u8 IE = _mmu.GetIE();
