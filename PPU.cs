@@ -157,7 +157,7 @@ public class PPU {
             u16 tileAddress = (u16) (tileMapBase + (pY / 8) * 32 + pX / 8);
             // 從 Tile Map 中讀取 Tile ID，確定當前 Tile 的數據在 Tile Data 中的位置
             sbyte tileID = (sbyte) (_mmu.VRAM[tileAddress & 0x1FFF]);
-            ushort tileDataAddress = (ushort)(tileDataBase + (IsBit(4, _mmu.LCDC) ? tileID : tileID + 128) * 16);
+            u16 tileDataAddress = (u16) (tileDataBase + ((((_mmu.LCDC >> 4) & 1) == 1) ? tileID : tileID + 128) * 16);
 
             byte tileLine = (byte)((pY % 8) * 2);
             byte lo = _mmu.ReadVRAM((ushort)(tileDataAddress + tileLine));
