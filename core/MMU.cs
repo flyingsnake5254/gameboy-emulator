@@ -24,6 +24,7 @@ public class MMU
     public u8 DIV { get { return IO[0x04]; } set { IO[0x04] = value; }}
     public u8 TAC { get { return IO[0x07]; } set { IO[0x07] = value; }}
     public u8 TIMA { get { return IO[0x05]; } set { IO[0x05] = value; }}
+    public u8 TMA { get { return IO[0x06]; } set { IO[0x06] = value; }}
     public u8 JOYPAD { get { return IO[0x00]; } set { IO[0x00] = value; }}
 
     private IMBC _mbc;
@@ -209,60 +210,10 @@ public class MMU
         }
     }
 
-    public u8 GetTIMA()
-    {
-        return IO[0x05];
-    }
-
-    public void SetTIMA(u8 value)
-    {
-        IO[0x05] = value;
-    }
 
     public void RequestInterrupt(u8 b) {
         IO[0x0F] |= (u8)(1 << b);
     }
-
-    public u8 GetTMA()
-    {
-        return IO[0x06];
-    }
-
-    public u8 GetJoyPad()
-    {
-        return IO[0x00];
-    }
-
-    public void SetJoyPad(u8 value)
-    {
-        IO[0x00] = value;
-    }
-
-    public u8 GetSTAT()
-    {
-        return IO[0x41]; 
-    }
-
-    public void SetSTAT(u8 value)
-    {
-        IO[0x41] = value;
-    }
-
-    public u8 GetLCDC()
-    {
-        return IO[0x40]; 
-    }
-
-    public void SetLCDC(u8 value)
-    {
-        IO[0x40] = value;
-    }
-
-    public u8 GetLY()
-    {
-        return IO[0x44]; 
-    }
-
 
 
     public u8 GetIE()

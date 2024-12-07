@@ -48,14 +48,14 @@ public class Timer
             TIMA += cycles;
             while (TIMA >= mmu.GetTACFrequence())
             {
-                mmu.SetTIMA((u8) (mmu.GetTIMA() + 1));
+                mmu.TIMA = ((u8) (mmu.TIMA + 1));
                 TIMA -= mmu.GetTACFrequence();
             }
 
-            if (mmu.GetTIMA() == 0xFF)
+            if (mmu.TIMA == 0xFF)
             {
                 mmu.RequestInterrupt(2);
-                mmu.SetTIMA(mmu.GetTMA());
+                mmu.TIMA = (mmu.TMA);
             }
         }
     }

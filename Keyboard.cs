@@ -54,16 +54,16 @@ public class Keyboard
     }
 
     public void Update(ref MMU mmu) {
-        u8 JoyPad = mmu.GetJoyPad();
+        u8 JoyPad = mmu.JOYPAD;
         if (!IsBit(4, JoyPad)) {
-            mmu.SetJoyPad((u8)((JoyPad & 0xF0) | _joyPad));
+            mmu.JOYPAD = ((u8)((JoyPad & 0xF0) | _joyPad));
             if (_joyPad != 0xF) 
             {
                 mmu.RequestInterrupt(4);
             }
         }
         if (!IsBit(5, JoyPad)) {
-            mmu.SetJoyPad((u8)((JoyPad & 0xF0) | buttons));
+            mmu.JOYPAD = ((u8)((JoyPad & 0xF0) | buttons));
             if (buttons != 0xF) 
             {
                 mmu.RequestInterrupt(4);
@@ -71,7 +71,7 @@ public class Keyboard
         }
         if ((JoyPad & 0b00110000) == 0b00110000) 
         {
-            mmu.SetJoyPad(0xFF);
+            mmu.JOYPAD = (0xFF);
         }
     }
 

@@ -33,9 +33,9 @@ public class PPU {
 
     public void Update(ref MMU mmu, int cycles) {
         _scanlineCounter += cycles;
-        byte currentMode = (byte)(mmu.GetSTAT() & 0x3); // LCD 模式
+        byte currentMode = (byte)(mmu.STAT & 0x3); // LCD 模式
 
-        if (IsLCDEnabled(mmu.GetLCDC())) {
+        if (IsLCDEnabled(mmu.LCDC)) {
             switch (currentMode) {
                 case 2: // OAM 掃描模式
                     if (_scanlineCounter >= 80) {
@@ -52,10 +52,10 @@ public class PPU {
                     break;
                 case 0: // HBLANK 模式
                     if (_scanlineCounter >= 204) {
-                        mmu.LY = ((byte)(mmu.GetLY() + 1));
+                        mmu.LY = ((byte)(mmu.LY  + 1));
                         _scanlineCounter -= 204;
 
-                        if (mmu.GetLY() == Global.SCREEN_HEIGHT) {
+                        if (mmu.LY  == Global.SCREEN_HEIGHT) {
                             ChangeSTATMode(1, mmu);
                             mmu.RequestInterrupt(0); // 發送 VBLANK 中斷
                             RenderFrame(); // 完成一幀後觸發繪製
@@ -66,10 +66,10 @@ public class PPU {
                     break;
                 case 1: // VBLANK 模式
                     if (_scanlineCounter >= 456) {
-                        mmu.LY = ((byte)(mmu.GetLY() + 1));
+                        mmu.LY = ((byte)(mmu.LY  + 1));
                         _scanlineCounter -= 456;
 
-                        if (mmu.GetLY() > 153) {
+                        if (mmu.LY  > 153) {
                             ChangeSTATMode(2, mmu);
                             mmu.LY = (0); // 重置掃描線
                         }
@@ -78,23 +78,23 @@ public class PPU {
             }
 
             // 設置 coincidence flag
-            if (mmu.GetLY() == mmu.LYC) {
-                mmu.SetSTAT(BitSet(2, mmu.GetSTAT()));
-                if (IsBit(6, mmu.GetSTAT())) mmu.RequestInterrupt(1);
+            if (mmu.LY  == mmu.LYC) {
+                mmu.STAT = (BitSet(2, mmu.STAT));
+                if (IsBit(6, mmu.STAT)) mmu.RequestInterrupt(1);
             } else {
-                mmu.SetSTAT(BitClear(2, mmu.GetSTAT()));
+                mmu.STAT = (BitClear(2, mmu.STAT));
             }
         } 
         else {
             _scanlineCounter = 0;
             mmu.LY = (0);
-            mmu.SetSTAT((byte)(mmu.GetSTAT() & ~0x3));
+            mmu.STAT = ((byte)(mmu.STAT & ~0x3));
         }
     }
 
     private void ChangeSTATMode(int mode, MMU mmu) {
-        byte STAT = (byte)(mmu.GetSTAT() & ~0x3);
-        mmu.SetSTAT((byte)(STAT | mode));
+        byte STAT = (byte)(mmu.STAT & ~0x3);
+        mmu.STAT = ((byte)(STAT | mode));
 
         if (mode == 2 && IsBit(5, STAT)) mmu.RequestInterrupt(1); // OAM 中斷
         else if (mode == 0 && IsBit(3, STAT)) mmu.RequestInterrupt(1); // HBLANK 中斷
@@ -102,9 +102,9 @@ public class PPU {
     }
 
     private void DrawScanLine(MMU mmu) {
-        byte LCDC = mmu.GetLCDC();
+        byte LCDC = mmu.LCDC;
         if (IsBit(0, LCDC)) RenderBG(mmu);
-        if (IsBit(5, LCDC) && mmu.WY <= mmu.GetLY()) RenderWindow(mmu);
+        if (IsBit(5, LCDC) && mmu.WY <= mmu.LY ) RenderWindow(mmu);
         if (IsBit(1, LCDC)) RenderSprites(mmu);
     }
 
@@ -112,8 +112,8 @@ public class PPU {
         byte LY = mmu.LY;
         byte SCY = mmu.SCY;
         byte SCX = mmu.SCX;
-        ushort tileMapBase = GetBGTileMapAddress(mmu.GetLCDC());
-        ushort tileDataBase = IsBit(4, mmu.GetLCDC()) ? (ushort)0x8000 : (ushort)0x8800;
+        ushort tileMapBase = GetBGTileMapAddress(mmu.LCDC);
+        ushort tileDataBase = IsBit(4, mmu.LCDC) ? (ushort)0x8000 : (ushort)0x8800;
 
         for (int x = 0; x < Global.SCREEN_WIDTH; x++) {
             byte pixelX = (byte)((x + SCX) & 0xFF);
@@ -121,7 +121,7 @@ public class PPU {
 
             ushort tileAddress = (ushort)(tileMapBase + (pixelY / 8) * 32 + (pixelX / 8));
             sbyte tileId = (sbyte)mmu.ReadVRAM(tileAddress);
-            ushort tileDataAddress = (ushort)(tileDataBase + (IsBit(4, mmu.GetLCDC()) ? tileId : tileId + 128) * 16);
+            ushort tileDataAddress = (ushort)(tileDataBase + (IsBit(4, mmu.LCDC) ? tileId : tileId + 128) * 16);
 
             byte tileLine = (byte)((pixelY % 8) * 2);
             byte lo = mmu.ReadVRAM((ushort)(tileDataAddress + tileLine));
@@ -136,11 +136,11 @@ public class PPU {
     private void RenderWindow(MMU mmu) {
         byte WY = mmu.WY;
         byte WX = (byte)(mmu.WX - 7);
-        byte LY = mmu.GetLY();
+        byte LY = mmu.LY ;
 
         if (LY >= WY) {
-            ushort tileMapBase = IsBit(6, mmu.GetLCDC()) ? (ushort)0x9C00 : (ushort)0x9800;
-            ushort tileDataBase = IsBit(4, mmu.GetLCDC()) ? (ushort)0x8000 : (ushort)0x8800;
+            ushort tileMapBase = IsBit(6, mmu.LCDC) ? (ushort)0x9C00 : (ushort)0x9800;
+            ushort tileDataBase = IsBit(4, mmu.LCDC) ? (ushort)0x8000 : (ushort)0x8800;
 
             byte windowY = (byte)(LY - WY);
 
@@ -150,7 +150,7 @@ public class PPU {
 
                     ushort tileAddress = (ushort)(tileMapBase + (windowY / 8) * 32 + (windowX / 8));
                     sbyte tileId = (sbyte)mmu.ReadVRAM(tileAddress);
-                    ushort tileDataAddress = (ushort)(tileDataBase + (IsBit(4, mmu.GetLCDC()) ? tileId : tileId + 128) * 16);
+                    ushort tileDataAddress = (ushort)(tileDataBase + (IsBit(4, mmu.LCDC) ? tileId : tileId + 128) * 16);
 
                     byte tileLine = (byte)((windowY % 8) * 2);
                     byte lo = mmu.ReadVRAM((ushort)(tileDataAddress + tileLine));
@@ -165,8 +165,8 @@ public class PPU {
     }
 
     private void RenderSprites(MMU mmu) {
-        byte LY = mmu.GetLY();
-        byte LCDC = mmu.GetLCDC();
+        byte LY = mmu.LY ;
+        byte LCDC = mmu.LCDC;
 
         for (int i = 0x9C; i >= 0; i -= 4) {
             int y = mmu.ReadOAM(i) - 16;

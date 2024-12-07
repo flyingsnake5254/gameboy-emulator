@@ -1085,6 +1085,6 @@ public class CPU
         if (dev >= 23440108 /*&& PC == 0x35A*/) //0x100 23440108
             Console.WriteLine("Cycle " + dev + " PC " + (PC - 1).ToString("x4") + " Stack: " + SP.ToString("x4") + " AF: " + A.ToString("x2") + "" + F.ToString("x2")
                 + " BC: " + B.ToString("x2") + "" + C.ToString("x2") + " DE: " + D.ToString("x2") + "" + E.ToString("x2") + " HL: " + H.ToString("x2") + "" + L.ToString("x2")
-                + " op " + opcode.ToString("x2") + " D16 " + mmu.ReadROM16(PC).ToString("x4") + " LY: " + mmu.GetLY().ToString("x2"));
+                + " op " + opcode.ToString("x2") + " D16 " + mmu.ReadROM16(PC).ToString("x4") + " LY: " + mmu.LY .ToString("x2"));
     }
 }
