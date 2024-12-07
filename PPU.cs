@@ -144,15 +144,12 @@ public class PPU {
 
 
     private void BGToBuffer() {
-        byte LY = _mmu.LY;
-        byte SCY = _mmu.SCY;
-        byte SCX = _mmu.SCX;
         u16 tileMapBase = (u16) ((((_mmu.LCDC >> 3) & 1) == 1) ? 0x9C00 : 0x9800);
         u16 tileDataBase = (u16) ((((_mmu.LCDC >> 4) & 1) == 1) ? 0x8000 : 0x8800);
 
         for (int x = 0; x < Global.SCREEN_WIDTH; x++) {
-            byte pixelX = (byte)((x + SCX) & 0xFF);
-            byte pixelY = (byte)((LY + SCY) & 0xFF);
+            byte pixelX = (byte)((x + _mmu.SCX) & 0xFF);
+            byte pixelY = (byte)((_mmu.LY + _mmu.SCY) & 0xFF);
 
             ushort tileAddress = (ushort)(tileMapBase + (pixelY / 8) * 32 + (pixelX / 8));
             sbyte tileId = (sbyte)_mmu.ReadVRAM(tileAddress);
@@ -164,7 +161,7 @@ public class PPU {
 
             int colorBit = 7 - (pixelX % 8);
             int paletteIndex = ((hi >> colorBit) & 1) << 1 | ((lo >> colorBit) & 1);
-            _frameBuffer[x, LY] = _color[(_mmu.BGP >> (paletteIndex * 2)) & 0x3];
+            _frameBuffer[x, _mmu.LY] = _color[(_mmu.BGP >> (paletteIndex * 2)) & 0x3];
         }
     }
 
