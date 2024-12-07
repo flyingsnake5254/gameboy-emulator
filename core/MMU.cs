@@ -293,35 +293,12 @@ public class MMU
         return IO[0x42]; 
     }
 
-    public void SetSCY(u8 value)
-    {
-        IO[0x42] = value;
-    }
-
-    public u8 GetBGP()
-    {
-        return IO[0x47]; 
-    }
-
-    public void SetBGP(u8 value)
-    {
-        IO[0x47] = value;
-    }
 
     public u8 GetIE()
     {
         return HRAM[0x7F]; 
     }
 
-    public void SetIE(u8 value)
-    {
-        HRAM[0x7F] = value;
-    }
-
-    public u8 GetIF()
-    {
-        return IO[0x0F]; 
-    }
 
 
     public u8 ReadVRAM(u16 address)

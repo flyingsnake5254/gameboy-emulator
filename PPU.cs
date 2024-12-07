@@ -129,7 +129,7 @@ public class PPU {
 
             int colorBit = 7 - (pixelX % 8);
             int paletteIndex = ((hi >> colorBit) & 1) << 1 | ((lo >> colorBit) & 1);
-            _frameBuffer[x, LY] = _color[(mmu.GetBGP() >> (paletteIndex * 2)) & 0x3];
+            _frameBuffer[x, LY] = _color[(mmu.BGP >> (paletteIndex * 2)) & 0x3];
         }
     }
 
@@ -158,7 +158,7 @@ public class PPU {
 
                     int colorBit = 7 - (windowX % 8);
                     int paletteIndex = ((hi >> colorBit) & 1) << 1 | ((lo >> colorBit) & 1);
-                    _frameBuffer[x, LY] = _color[(mmu.GetBGP() >> (paletteIndex * 2)) & 0x3];
+                    _frameBuffer[x, LY] = _color[(mmu.BGP >> (paletteIndex * 2)) & 0x3];
                 }
             }
         }
