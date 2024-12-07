@@ -16,7 +16,7 @@ public class MBC1 : IMBC
         _rom = rom;
     }
 
-    public u8 ReadROM(u16 address)
+    public u8 Read(u16 address)
     {
         if (address < 0x4000)
         {
@@ -30,7 +30,7 @@ public class MBC1 : IMBC
         return 0;
     }
 
-    public void WriteROM(u16 address, u8 value)
+    public void Write(u16 address, u8 value)
     {
         if (address < 0x2000)
         {

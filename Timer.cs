@@ -36,7 +36,7 @@ public class Timer
         DIV += cycles;
         while (DIV >= 256)
         {
-            mmu.SetDIV((u8) (mmu.GetDIV() + 1));
+            mmu.DIV = (u8) (mmu.DIV + 1);
             DIV -= 256;
         }
     }

@@ -4,8 +4,6 @@ public class MMU
     public u8[] IO = new u8[0xFF7F - 0xFF00 + 1];
     public u8[] VRAM = new u8[0x9FFF - 0x8000 + 1];
     public u8[] WRAM = new u8[0xDFFF - 0xC000 + 1];
-    private u8[] WRAM0 = new u8[0x1000];
-    private u8[] WRAM1 = new u8[0x1000];
     public u8[] OAM = new u8[0xFE9F - 0xFE00 + 1];
     private u8[] HRAM = new u8[0x80];
 
@@ -36,11 +34,11 @@ public class MMU
         IOInit();
     }
 
-    public u8 ReadROM(u16 address)
+    public u8 Read(u16 address)
     {
         if (address < 0x8000)
         {
-            return _mbc.ReadROM(address);
+            return _mbc.Read(address);
         }
         else if (address < 0xA000)
         {
@@ -50,17 +48,13 @@ public class MMU
         {
             return _mbc.ReadERAM(address);
         }
-        else if (address < 0xD000)
-        {
-            return WRAM0[address & 0xFFF];
-        }
         else if (address < 0xE000)
         {
-            return WRAM1[address & 0xFFF];
+            return WRAM[address & 0x1FFF];
         }
         else if (address < 0xF000)
         {
-            return WRAM0[address & 0xFFF];
+            // return WRAM0[address & 0xFFF];
         }
         else if (address < 0xFEA0)
         {
@@ -78,24 +72,20 @@ public class MMU
         {
             return HRAM[address & 0x7F];
         }
-        else
-        {
-            return 0xFF;
-        }
+        
+        return 0xFF;
 
     }
 
-    public void WriteROM(u16 address, u8 value)
+    public void Write(u16 address, u8 value)
     {
-        if (address < 0x8000) _mbc.WriteROM(address, value);
+        if (address < 0x8000) _mbc.Write(address, value);
         else if (address < 0xA000) VRAM[address & 0x1FFF] = value;
         else if (address < 0xC000) _mbc.WriteERAM(address, value);
-        else if (address < 0xD000) WRAM0[address & 0xFFF] = value;
-        else if (address < 0xE000) WRAM1[address & 0xFFF] = value;
-        else if (address < 0xF000) WRAM0[address & 0xFFF] = value;
-        else if (address < 0xFE00) WRAM1[address & 0xFFF] = value;
+        else if (address < 0xE000) WRAM[address & 0x1FFF] = value;
+        else if (address < 0xFE00) { /* Echo Ram - 禁用 */ }
         else if (address < 0xFEA0) OAM[address & 0x9F] = value;
-        else if (address < 0xFF00) ; // Not Usable
+        else if (address < 0xFF00) { /* Not Usable - 禁用 */ }
         else if (address < 0xFF80) 
         {
             if (address == 0xFF0F) IO[address & 0x7F] = (u8) (value | 0xE0);
@@ -105,7 +95,7 @@ public class MMU
                 u16 tempAddr = (u16) (value << 8);
                 for (u8 i = 0 ; i < OAM.Length ; i ++)
                 {
-                    OAM[i] = ReadROM((u16) (tempAddr + i));
+                    OAM[i] = Read((u16) (tempAddr + i));
                 }
             }
             else IO[address & 0x7F] = value;
@@ -114,13 +104,13 @@ public class MMU
     }
     public u16 ReadROM16(u16 address)
     {
-        return (u16)(ReadROM((u16)(address + 1)) << 8 | ReadROM(address));
+        return (u16)(Read((u16)(address + 1)) << 8 | Read(address));
     }
     
     public void WriteROM16(u16 address, u16 value)
     {
-        WriteROM((u16)(address + 1), (u8)(value >> 8));
-        WriteROM(address, (u8) value);
+        Write((u16)(address + 1), (u8)(value >> 8));
+        Write(address, (u8) value);
     }
 
     public u8 ReadOAM(int address)
@@ -161,16 +151,6 @@ public class MMU
         // IO[0x4A] = 0x00; // WY
         // IO[0x4B] = 0x00; // WX
         // IO[0xFF] = 0x00; // IE (Interrupt Enable)
-    }
-
-    public void SetDIV(u8 value)
-    {
-        IO[0x04] = value;
-    }
-
-    public u8 GetDIV()
-    {
-        return IO[0x04];
     }
 
     public bool GetTACState()
