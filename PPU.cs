@@ -147,8 +147,8 @@ public class PPU {
         byte LY = _mmu.LY;
         byte SCY = _mmu.SCY;
         byte SCX = _mmu.SCX;
-        ushort tileMapBase = GetBGTileMapAddress(_mmu.LCDC);
-        ushort tileDataBase = IsBit(4, _mmu.LCDC) ? (ushort)0x8000 : (ushort)0x8800;
+        u16 tileMapBase = (u16) ((((_mmu.LCDC >> 3) & 1) == 1) ? 0x9C00 : 0x9800);
+        u16 tileDataBase = (u16) ((((_mmu.LCDC >> 4) & 1) == 1) ? 0x8000 : 0x8800);
 
         for (int x = 0; x < Global.SCREEN_WIDTH; x++) {
             byte pixelX = (byte)((x + SCX) & 0xFF);
