@@ -36,7 +36,7 @@ public class PPU {
         _countCycles += cycles;
         byte currentMode = (byte)(_mmu.STAT & 0x3); // LCD 模式
 
-        if (IsLCDEnabled(_mmu.LCDC)) {
+        if (((_mmu.LCDC >> 7) & 1) == 1) {
             switch (currentMode) {
                 case 2: // OAM 掃描模式
                     if (_countCycles >= 80) {
