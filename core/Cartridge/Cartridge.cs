@@ -1,7 +1,7 @@
 public class Cartridge
 {
     private u8[] _rom;
-    private IMBC _IMBC;
+    private ICartridgeType _ICartridgeType;
 
     private string _filePath;
 
@@ -18,12 +18,12 @@ public class Cartridge
         // Cartridge Type
         if (_rom[0x147] == 0x01) // MBC1
         {
-            _IMBC = new MBC1(ref _rom);
+            _ICartridgeType = new MBC1(ref _rom);
         }
     }
 
-    public IMBC GetMBC()
+    public ICartridgeType GetMBC()
     {
-        return _IMBC;
+        return _ICartridgeType;
     }
 }

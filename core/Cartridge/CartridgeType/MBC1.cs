@@ -3,7 +3,7 @@
 0x0000 - 0x3FFF : Bank0
 0x4000 - 0x7FFF : Bank1-N
 */
-public class MBC1 : IMBC
+public class MBC1 : ICartridgeType
 {
     private u8[] _rom;
     private u8[] _eram = new u8[0x8000];

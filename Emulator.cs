@@ -14,7 +14,7 @@ public class Emulator
     public Emulator(string filePath, DrawingArea drawingArea, Keyboard keyboard)
     {
         _cartridge = new Cartridge(filePath);
-        IMBC mbc = _cartridge.GetMBC();
+        ICartridgeType mbc = _cartridge.GetMBC();
         _mmu = new MMU(ref mbc);
         _cpu = new CPU(ref _mmu);
         _ppu = new PPU(ref _mmu, drawingArea);

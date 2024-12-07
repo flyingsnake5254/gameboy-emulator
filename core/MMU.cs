@@ -25,10 +25,10 @@ public class MMU
     public u8 TMA { get { return IO[0x06]; } set { IO[0x06] = value; }}
     public u8 JOYPAD { get { return IO[0x00]; } set { IO[0x00] = value; }}
 
-    private IMBC _mbc;
+    private ICartridgeType _mbc;
     
 
-    public MMU(ref IMBC mbc)
+    public MMU(ref ICartridgeType mbc)
     {
         this._mbc = mbc;
         IOInit();
