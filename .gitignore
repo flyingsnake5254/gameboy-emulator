@@ -1,0 +1,26 @@
+# 編譯產生的檔案
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+
+# IDE 和編輯器設定
+*.user
+*.suo
+*.userprefs
+.vs/
+.vscode/
+*.nupkg
+
+# 系統產生的檔案
+.DS_Store
+Thumbs.db
+.directory
+
+# NuGet
+packages/
+*.log
+*.cache
+project.lock.json
+project.assets.json
