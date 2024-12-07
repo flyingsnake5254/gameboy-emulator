@@ -143,7 +143,8 @@ public class PPU {
     }
 
 
-    private void BGToBuffer() {
+    private void BGToBuffer() 
+    {
         u16 tileMapBase = (u16) ((((_mmu.LCDC >> 3) & 1) == 1) ? 0x9C00 : 0x9800);
         u16 tileDataBase = (u16) ((((_mmu.LCDC >> 4) & 1) == 1) ? 0x8000 : 0x8800);
 
@@ -171,32 +172,35 @@ public class PPU {
         }
     }
 
-    private void WindowToBuffer() {
-        byte WY = _mmu.WY;
-        byte WX = (byte)(_mmu.WX - 7);
-        byte LY = _mmu.LY;
+    private void WindowToBuffer()
+    {
+        u8 WY = _mmu.WY;
+        u8 WX = (u8) (_mmu.WX - 7);
 
-        if (LY >= WY) {
-            ushort tileMapBase = IsBit(6, _mmu.LCDC) ? (ushort)0x9C00 : (ushort)0x9800;
-            ushort tileDataBase = IsBit(4, _mmu.LCDC) ? (ushort)0x8000 : (ushort)0x8800;
+        if (_mmu.LY >= WY)
+        {
+            u16 tileMapBase = (u16) ((((_mmu.LCDC >> 6) & 1) == 1) ? 0x9C00 : 0x9800);
+            u16 tileDataBase = (u16) ((((_mmu.LCDC >> 4) & 1) == 1) ? 0x8000 : 0x8800);
 
-            byte windowY = (byte)(LY - WY);
+            u8 winY = (u8) (_mmu.LY - WY);
 
-            for (int x = 0; x < Global.SCREEN_WIDTH; x++) {
-                if (x >= WX) {
-                    byte windowX = (byte)(x - WX);
+            for (int x = 0 ; x < Global.SCREEN_WIDTH ; x ++) 
+            {
+                if (x >= WX) 
+                {
+                    u8 winX = (u8) (x - WX);
 
-                    ushort tileAddress = (ushort)(tileMapBase + (windowY / 8) * 32 + (windowX / 8));
-                    sbyte tileId = (sbyte)_mmu.ReadVRAM(tileAddress);
-                    ushort tileDataAddress = (ushort)(tileDataBase + (IsBit(4, _mmu.LCDC) ? tileId : tileId + 128) * 16);
+                    u16 tileAddress = (u16) (tileMapBase + (winY / 8) * 32 + (winX / 8));
+                    int tileID = (int) _mmu.VRAM[tileAddress & 0x1FFF];
+                    u16 tileDataAddress = (u16) (tileDataBase + ((((_mmu.LCDC >> 4) & 1) == 1) ? tileID : tileID + 128) * 16);
 
-                    byte tileLine = (byte)((windowY % 8) * 2);
-                    byte lo = _mmu.ReadVRAM((ushort)(tileDataAddress + tileLine));
-                    byte hi = _mmu.ReadVRAM((ushort)(tileDataAddress + tileLine + 1));
+                    byte tileLine = (u8) ((winY % 8) * 2);
+                    u8 low = _mmu.VRAM[(tileDataAddress + tileLine) & 0x1FFF];
+                    u8 high = _mmu.VRAM[(tileDataAddress + tileLine + 1) & 0x1FFF];
 
-                    int colorBit = 7 - (windowX % 8);
-                    int paletteIndex = ((hi >> colorBit) & 1) << 1 | ((lo >> colorBit) & 1);
-                    _frameBuffer[x, LY] = _color[(_mmu.BGP >> (paletteIndex * 2)) & 0x3];
+                    int colorBias = 7 - (winX % 8);
+                    int index = ((high >> colorBias) & 1) << 1 | ((low >> colorBias) & 1);
+                    _frameBuffer[x, _mmu.LY] = _color[(_mmu.BGP >> (index * 2)) & 0b00000011];
                 }
             }
         }
