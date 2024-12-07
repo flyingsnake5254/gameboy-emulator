@@ -48,7 +48,7 @@ public class Emulator
 
                 // 中斷處理
                 u8 IE = _mmu.GetIE();
-                u8 IF = _mmu.GetIF();
+                u8 IF = _mmu.IFRegister;
                 for (int i = 0; i < 5; i++)
                 {
                     if ((((IE & IF) >> i) & 0x1) == 1)

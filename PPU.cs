@@ -104,7 +104,7 @@ public class PPU {
     private void DrawScanLine(MMU mmu) {
         byte LCDC = mmu.GetLCDC();
         if (IsBit(0, LCDC)) RenderBG(mmu);
-        if (IsBit(5, LCDC) && mmu.GetWY() <= mmu.GetLY()) RenderWindow(mmu);
+        if (IsBit(5, LCDC) && mmu.WY <= mmu.GetLY()) RenderWindow(mmu);
         if (IsBit(1, LCDC)) RenderSprites(mmu);
     }
 
@@ -134,7 +134,7 @@ public class PPU {
     }
 
     private void RenderWindow(MMU mmu) {
-        byte WY = mmu.GetWY();
+        byte WY = mmu.WY;
         byte WX = (byte)(mmu.WX - 7);
         byte LY = mmu.GetLY();
 
@@ -175,7 +175,7 @@ public class PPU {
             byte attr = mmu.ReadOAM(i + 3);
 
             if ((LY >= y) && (LY < y + (IsBit(2, LCDC) ? 16 : 8))) {
-                byte palette = IsBit(4, attr) ? mmu.GetOBP1() : mmu.GetOBP0();
+                byte palette = IsBit(4, attr) ? mmu.OBP1 : mmu.OBP0;
                 bool aboveBG = !IsBit(7, attr);
 
                 int tileRow = IsBit(6, attr) ? (IsBit(2, LCDC) ? 16 : 8) - 1 - (LY - y) : (LY - y);

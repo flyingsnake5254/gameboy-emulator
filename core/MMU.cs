@@ -323,40 +323,6 @@ public class MMU
         return IO[0x0F]; 
     }
 
-    public void SetIF(u8 value)
-    {
-        IO[0x0F] = value;
-    }
-
-    public u8 GetOBP0()
-    {
-        return IO[0x48]; 
-    }
-
-    public void SetOBP0(u8 value)
-    {
-        IO[0x48] = value;
-    }
-
-    public u8 GetOBP1()
-    {
-        return IO[0x49]; 
-    }
-
-    public void SetOBP1(u8 value)
-    {
-        IO[0x49] = value;
-    }
-
-    public u8 GetWY()
-    {
-        return IO[0x4A]; 
-    }
-
-    public void SetWY(u8 value)
-    {
-        IO[0x4A] = value;
-    }
 
     public u8 ReadVRAM(u16 address)
     {

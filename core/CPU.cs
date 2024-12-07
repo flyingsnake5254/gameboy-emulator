@@ -995,7 +995,7 @@ public class CPU
 
     private void HALT() {
         if (!IME) {
-            if ((mmu.GetIE() & mmu.GetIF() & 0x1F) == 0) {
+            if ((mmu.GetIE() & mmu.IFRegister & 0x1F) == 0) {
                 HALTED = true;
                 PC--;
             } else {
@@ -1019,7 +1019,7 @@ public class CPU
             PC = (ushort)(0x40 + (8 * b));
             IME = false;
             
-            mmu.SetIF(BitClear(b, mmu.GetIF()));
+            mmu.IFRegister = BitClear(b, mmu.IFRegister);
         }
     }
 
