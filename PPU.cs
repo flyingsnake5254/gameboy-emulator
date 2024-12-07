@@ -2,15 +2,16 @@ using Gtk;
 using Cairo;
 using System.Runtime.CompilerServices;
 
-
 public class PPU {
 
     private int[] _color = new int[] { 0x00FFFFFF, 0x00808080, 0x00404040, 0 }; // 調色板顏色
     private DrawingArea _drawingArea;
     private int[,] _frameBuffer = new int[Global.SCREEN_WIDTH, Global.SCREEN_HEIGHT];
     private int _scanlineCounter;
+    private MMU _mmu;
 
-    public PPU(DrawingArea drawingArea) {
+    public PPU(ref MMU mmu, DrawingArea drawingArea) {
+        this._mmu = mmu;
         _drawingArea = drawingArea;
         _drawingArea.Drawn += OnDrawn;
     }
@@ -31,116 +32,116 @@ public class PPU {
         
     */
 
-    public void Update(ref MMU mmu, int cycles) {
+    public void Update(int cycles) {
         _scanlineCounter += cycles;
-        byte currentMode = (byte)(mmu.STAT & 0x3); // LCD 模式
+        byte currentMode = (byte)(_mmu.STAT & 0x3); // LCD 模式
 
-        if (IsLCDEnabled(mmu.LCDC)) {
+        if (IsLCDEnabled(_mmu.LCDC)) {
             switch (currentMode) {
                 case 2: // OAM 掃描模式
                     if (_scanlineCounter >= 80) {
-                        ChangeSTATMode(3, mmu);
+                        ChangeSTATMode(3, _mmu);
                         _scanlineCounter -= 80;
                     }
                     break;
                 case 3: // VRAM 模式
                     if (_scanlineCounter >= 172) {
-                        ChangeSTATMode(0, mmu);
-                        DrawScanLine(mmu);
+                        ChangeSTATMode(0, _mmu);
+                        DrawScanLine(_mmu);
                         _scanlineCounter -= 172;
                     }
                     break;
                 case 0: // HBLANK 模式
                     if (_scanlineCounter >= 204) {
-                        mmu.LY = ((byte)(mmu.LY  + 1));
+                        _mmu.LY = (byte)(_mmu.LY + 1);
                         _scanlineCounter -= 204;
 
-                        if (mmu.LY  == Global.SCREEN_HEIGHT) {
-                            ChangeSTATMode(1, mmu);
-                            mmu.RequestInterrupt(0); // 發送 VBLANK 中斷
+                        if (_mmu.LY == Global.SCREEN_HEIGHT) {
+                            ChangeSTATMode(1, _mmu);
+                            _mmu.RequestInterrupt(0); // 發送 VBLANK 中斷
                             RenderFrame(); // 完成一幀後觸發繪製
                         } else {
-                            ChangeSTATMode(2, mmu);
+                            ChangeSTATMode(2, _mmu);
                         }
                     }
                     break;
                 case 1: // VBLANK 模式
                     if (_scanlineCounter >= 456) {
-                        mmu.LY = ((byte)(mmu.LY  + 1));
+                        _mmu.LY = (byte)(_mmu.LY + 1);
                         _scanlineCounter -= 456;
 
-                        if (mmu.LY  > 153) {
-                            ChangeSTATMode(2, mmu);
-                            mmu.LY = (0); // 重置掃描線
+                        if (_mmu.LY > 153) {
+                            ChangeSTATMode(2, _mmu);
+                            _mmu.LY = 0; // 重置掃描線
                         }
                     }
                     break;
             }
 
             // 設置 coincidence flag
-            if (mmu.LY  == mmu.LYC) {
-                mmu.STAT = (BitSet(2, mmu.STAT));
-                if (IsBit(6, mmu.STAT)) mmu.RequestInterrupt(1);
+            if (_mmu.LY == _mmu.LYC) {
+                _mmu.STAT = BitSet(2, _mmu.STAT);
+                if (IsBit(6, _mmu.STAT)) _mmu.RequestInterrupt(1);
             } else {
-                mmu.STAT = (BitClear(2, mmu.STAT));
+                _mmu.STAT = BitClear(2, _mmu.STAT);
             }
         } 
         else {
             _scanlineCounter = 0;
-            mmu.LY = (0);
-            mmu.STAT = ((byte)(mmu.STAT & ~0x3));
+            _mmu.LY = 0;
+            _mmu.STAT = (byte)(_mmu.STAT & ~0x3);
         }
     }
 
-    private void ChangeSTATMode(int mode, MMU mmu) {
-        byte STAT = (byte)(mmu.STAT & ~0x3);
-        mmu.STAT = ((byte)(STAT | mode));
+    private void ChangeSTATMode(int mode, MMU _mmu) {
+        byte STAT = (byte)(_mmu.STAT & ~0x3);
+        _mmu.STAT = (byte)(STAT | mode);
 
-        if (mode == 2 && IsBit(5, STAT)) mmu.RequestInterrupt(1); // OAM 中斷
-        else if (mode == 0 && IsBit(3, STAT)) mmu.RequestInterrupt(1); // HBLANK 中斷
-        else if (mode == 1 && IsBit(4, STAT)) mmu.RequestInterrupt(1); // VBLANK 中斷
+        if (mode == 2 && IsBit(5, STAT)) _mmu.RequestInterrupt(1); // OAM 中斷
+        else if (mode == 0 && IsBit(3, STAT)) _mmu.RequestInterrupt(1); // HBLANK 中斷
+        else if (mode == 1 && IsBit(4, STAT)) _mmu.RequestInterrupt(1); // VBLANK 中斷
     }
 
-    private void DrawScanLine(MMU mmu) {
-        byte LCDC = mmu.LCDC;
-        if (IsBit(0, LCDC)) RenderBG(mmu);
-        if (IsBit(5, LCDC) && mmu.WY <= mmu.LY ) RenderWindow(mmu);
-        if (IsBit(1, LCDC)) RenderSprites(mmu);
+    private void DrawScanLine(MMU _mmu) {
+        byte LCDC = _mmu.LCDC;
+        if (IsBit(0, LCDC)) RenderBG(_mmu);
+        if (IsBit(5, LCDC) && _mmu.WY <= _mmu.LY) RenderWindow(_mmu);
+        if (IsBit(1, LCDC)) RenderSprites(_mmu);
     }
 
-    private void RenderBG(MMU mmu) {
-        byte LY = mmu.LY;
-        byte SCY = mmu.SCY;
-        byte SCX = mmu.SCX;
-        ushort tileMapBase = GetBGTileMapAddress(mmu.LCDC);
-        ushort tileDataBase = IsBit(4, mmu.LCDC) ? (ushort)0x8000 : (ushort)0x8800;
+    private void RenderBG(MMU _mmu) {
+        byte LY = _mmu.LY;
+        byte SCY = _mmu.SCY;
+        byte SCX = _mmu.SCX;
+        ushort tileMapBase = GetBGTileMapAddress(_mmu.LCDC);
+        ushort tileDataBase = IsBit(4, _mmu.LCDC) ? (ushort)0x8000 : (ushort)0x8800;
 
         for (int x = 0; x < Global.SCREEN_WIDTH; x++) {
             byte pixelX = (byte)((x + SCX) & 0xFF);
             byte pixelY = (byte)((LY + SCY) & 0xFF);
 
             ushort tileAddress = (ushort)(tileMapBase + (pixelY / 8) * 32 + (pixelX / 8));
-            sbyte tileId = (sbyte)mmu.ReadVRAM(tileAddress);
-            ushort tileDataAddress = (ushort)(tileDataBase + (IsBit(4, mmu.LCDC) ? tileId : tileId + 128) * 16);
+            sbyte tileId = (sbyte)_mmu.ReadVRAM(tileAddress);
+            ushort tileDataAddress = (ushort)(tileDataBase + (IsBit(4, _mmu.LCDC) ? tileId : tileId + 128) * 16);
 
             byte tileLine = (byte)((pixelY % 8) * 2);
-            byte lo = mmu.ReadVRAM((ushort)(tileDataAddress + tileLine));
-            byte hi = mmu.ReadVRAM((ushort)(tileDataAddress + tileLine + 1));
+            byte lo = _mmu.ReadVRAM((ushort)(tileDataAddress + tileLine));
+            byte hi = _mmu.ReadVRAM((ushort)(tileDataAddress + tileLine + 1));
 
             int colorBit = 7 - (pixelX % 8);
             int paletteIndex = ((hi >> colorBit) & 1) << 1 | ((lo >> colorBit) & 1);
-            _frameBuffer[x, LY] = _color[(mmu.BGP >> (paletteIndex * 2)) & 0x3];
+            _frameBuffer[x, LY] = _color[(_mmu.BGP >> (paletteIndex * 2)) & 0x3];
         }
     }
 
-    private void RenderWindow(MMU mmu) {
-        byte WY = mmu.WY;
-        byte WX = (byte)(mmu.WX - 7);
-        byte LY = mmu.LY ;
+    private void RenderWindow(MMU _mmu) {
+        byte WY = _mmu.WY;
+        byte WX = (byte)(_mmu.WX - 7);
+        byte LY = _mmu.LY;
 
         if (LY >= WY) {
-            ushort tileMapBase = IsBit(6, mmu.LCDC) ? (ushort)0x9C00 : (ushort)0x9800;
-            ushort tileDataBase = IsBit(4, mmu.LCDC) ? (ushort)0x8000 : (ushort)0x8800;
+            ushort tileMapBase = IsBit(6, _mmu.LCDC) ? (ushort)0x9C00 : (ushort)0x9800;
+            ushort tileDataBase = IsBit(4, _mmu.LCDC) ? (ushort)0x8000 : (ushort)0x8800;
 
             byte windowY = (byte)(LY - WY);
 
@@ -149,40 +150,40 @@ public class PPU {
                     byte windowX = (byte)(x - WX);
 
                     ushort tileAddress = (ushort)(tileMapBase + (windowY / 8) * 32 + (windowX / 8));
-                    sbyte tileId = (sbyte)mmu.ReadVRAM(tileAddress);
-                    ushort tileDataAddress = (ushort)(tileDataBase + (IsBit(4, mmu.LCDC) ? tileId : tileId + 128) * 16);
+                    sbyte tileId = (sbyte)_mmu.ReadVRAM(tileAddress);
+                    ushort tileDataAddress = (ushort)(tileDataBase + (IsBit(4, _mmu.LCDC) ? tileId : tileId + 128) * 16);
 
                     byte tileLine = (byte)((windowY % 8) * 2);
-                    byte lo = mmu.ReadVRAM((ushort)(tileDataAddress + tileLine));
-                    byte hi = mmu.ReadVRAM((ushort)(tileDataAddress + tileLine + 1));
+                    byte lo = _mmu.ReadVRAM((ushort)(tileDataAddress + tileLine));
+                    byte hi = _mmu.ReadVRAM((ushort)(tileDataAddress + tileLine + 1));
 
                     int colorBit = 7 - (windowX % 8);
                     int paletteIndex = ((hi >> colorBit) & 1) << 1 | ((lo >> colorBit) & 1);
-                    _frameBuffer[x, LY] = _color[(mmu.BGP >> (paletteIndex * 2)) & 0x3];
+                    _frameBuffer[x, LY] = _color[(_mmu.BGP >> (paletteIndex * 2)) & 0x3];
                 }
             }
         }
     }
 
-    private void RenderSprites(MMU mmu) {
-        byte LY = mmu.LY ;
-        byte LCDC = mmu.LCDC;
+    private void RenderSprites(MMU _mmu) {
+        byte LY = _mmu.LY;
+        byte LCDC = _mmu.LCDC;
 
         for (int i = 0x9C; i >= 0; i -= 4) {
-            int y = mmu.ReadOAM(i) - 16;
-            int x = mmu.ReadOAM(i + 1) - 8;
-            byte tile = mmu.ReadOAM(i + 2);
-            byte attr = mmu.ReadOAM(i + 3);
+            int y = _mmu.ReadOAM(i) - 16;
+            int x = _mmu.ReadOAM(i + 1) - 8;
+            byte tile = _mmu.ReadOAM(i + 2);
+            byte attr = _mmu.ReadOAM(i + 3);
 
             if ((LY >= y) && (LY < y + (IsBit(2, LCDC) ? 16 : 8))) {
-                byte palette = IsBit(4, attr) ? mmu.OBP1 : mmu.OBP0;
+                byte palette = IsBit(4, attr) ? _mmu.OBP1 : _mmu.OBP0;
                 bool aboveBG = !IsBit(7, attr);
 
                 int tileRow = IsBit(6, attr) ? (IsBit(2, LCDC) ? 16 : 8) - 1 - (LY - y) : (LY - y);
 
                 ushort tileAddress = (ushort)(0x8000 + tile * 16 + tileRow * 2);
-                byte lo = mmu.ReadVRAM(tileAddress);
-                byte hi = mmu.ReadVRAM((ushort)(tileAddress + 1));
+                byte lo = _mmu.ReadVRAM(tileAddress);
+                byte hi = _mmu.ReadVRAM((ushort)(tileAddress + 1));
 
                 for (int p = 0; p < 8; p++) {
                     int colorBit = IsBit(5, attr) ? p : 7 - p;
