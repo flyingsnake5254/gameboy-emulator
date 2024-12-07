@@ -213,7 +213,7 @@ public class PPU {
     }
 
     private async void RenderFrame() {
-        Thread.Sleep((int) (17 * (1 / Program.gameSpeed)));
+        Thread.Sleep((int) (17 * (1 / Global.GAME_SPEED)));
         Application.Invoke((sender, args) => _drawingArea.QueueDraw());
     }
 
