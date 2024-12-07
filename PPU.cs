@@ -152,7 +152,9 @@ public class PPU {
             u8 pX = (u8) ((x + _mmu.SCX) & 0b11111111);
             u8 pY = (u8) ((_mmu.LY + _mmu.SCY) & 0b11111111);
 
-            ushort tileAddress = (ushort)(tileMapBase + (pY / 8) * 32 + (pX / 8));
+            // 當前位址
+            // 使用公式計算當前像素對應的 Tile 在 Tile Map 中的地址
+            u16 tileAddress = (u16) (tileMapBase + (pY / 8) * 32 + pX / 8);
             sbyte tileId = (sbyte)_mmu.ReadVRAM(tileAddress);
             ushort tileDataAddress = (ushort)(tileDataBase + (IsBit(4, _mmu.LCDC) ? tileId : tileId + 128) * 16);
 
