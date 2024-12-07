@@ -18,7 +18,7 @@ public class Emulator
         _mmu = new MMU(ref mbc);
         _cpu = new CPU(ref _mmu);
         _ppu = new PPU(drawingArea);
-        _timer = new Timer();
+        _timer = new Timer(ref _mmu);
         _keyboard = keyboard; // 外部傳入的 Keyboard
 
         _running = true;
@@ -37,8 +37,8 @@ public class Emulator
                 cycles += returnCycles;
 
                 // 更新 Timer
-                _timer.UpdateDIV(ref _mmu, returnCycles);
-                _timer.UpdateTIMA(ref _mmu, returnCycles);
+                _timer.UpdateDIV(returnCycles);
+                _timer.UpdateTIMA(returnCycles);
 
                 // 更新 PPU
                 _ppu.Update(ref _mmu, returnCycles);
