@@ -35,106 +35,115 @@ public class PPU {
     public void Update(int cycles) {
         _countCycles += cycles;
 
-        if (((_mmu.LCDC >> 7) & 1) == 1) {
+        if (((_mmu.LCDC >> 7) & 1) == 1)
+        {
+            /* 進行 PPU 更新*/
+            
+            // 判斷 Mode ( STAT 低二位 )
             u8 mode = (u8) (_mmu.STAT & 0b00000011);
-            switch (mode) {
-                case 2: // OAM 掃描模式
-                    if (_countCycles >= 80)
+            // HBlank
+            if (mode == 0b00)
+            {
+                if (_countCycles >= 204)
+                {
+                    _mmu.LY = (u8) (_mmu.LY + 1);
+                    _countCycles -= 204;
+
+                    if (_mmu.LY == Global.SCREEN_HEIGHT)
                     {
-                        // 進到 VRAM --> 修改 STAT 狀態
+                        // Change State
                         _mmu.STAT = (u8) (_mmu.STAT & 0b11111100);
-                        _mmu.STAT = (u8) (_mmu.STAT | 0b00000011);
-                        _countCycles -= 80;
+                        _mmu.STAT = (u8) (_mmu.STAT | 0b00000001);
+
+                        // 中斷
+                        if ((((_mmu.STAT >> 4) & 1 )== 1)) _mmu.IO[0x0F] = (u8) (_mmu.IO[0x0F] | ((u8) (1 << 1)));
+                        _mmu.IO[0x0F] = (u8) (_mmu.IO[0x0F] | ((u8) (1 << 0)));
+
+                        // 繪製畫面
+                        Render();
                     }
-                    break;
-                case 3: // VRAM 模式
-                    if (_countCycles >= 172) {
-                        ChangeSTATMode(0, _mmu);
-                        DrawScanLine(_mmu);
-                        _countCycles -= 172;
-                    }
-                    break;
-                case 0: // HBLANK 模式
-                    if (_countCycles >= 204)
+                    else
                     {
-                        _mmu.LY = (u8) (_mmu.LY + 1);
-                        _countCycles -= 204;
+                        // Change State
+                        _mmu.STAT = (u8) (_mmu.STAT & 0b11111100);
+                        _mmu.STAT = (u8) (_mmu.STAT | 0b00000010);
 
-                        if (_mmu.LY == Global.SCREEN_HEIGHT)
-                        {
-                            // Change State
-                            _mmu.STAT = (u8) (_mmu.STAT & 0b11111100);
-                            _mmu.STAT = (u8) (_mmu.STAT | 0b00000001);
-
-                            // 中斷
-                            if ((((_mmu.STAT >> 4) & 1 )== 1)) _mmu.IO[0x0F] = (u8) (_mmu.IO[0x0F] | ((u8) (1 << 1)));
-                            _mmu.IO[0x0F] = (u8) (_mmu.IO[0x0F] | ((u8) (1 << 0)));
-
-                            // 繪製畫面
-                            Render();
-                        }
-                        else
-                        {
-                            // Change State
-                            _mmu.STAT = (u8) (_mmu.STAT & 0b11111100);
-                            _mmu.STAT = (u8) (_mmu.STAT | 0b00000010);
-
-                            // 中斷
-                            if ((((_mmu.STAT >> 5) & 1 )== 1)) _mmu.IO[0x0F] = (u8) (_mmu.IO[0x0F] | ((u8) (1 << 1)));
-                        }
+                        // 中斷
+                        if ((((_mmu.STAT >> 5) & 1 )== 1)) _mmu.IO[0x0F] = (u8) (_mmu.IO[0x0F] | ((u8) (1 << 1)));
                     }
-                    break;
-                case 1: // VBLANK 模式
-                    if (_countCycles >= 456)
+                }
+            }
+            // VBlank ( cycle = 456 )
+            else if (mode == 0b01)
+            {
+                if (_countCycles >= 456)
+                {
+                    _mmu.LY = (u8) (_mmu.LY + 1);
+                    _countCycles -= 456;
+
+                    if (_mmu.LY > 153)
                     {
-                        _mmu.LY = (u8) (_mmu.LY + 1);
-                        _countCycles -= 456;
-
-                        if (_mmu.LY > 153)
-                        {
-                            _mmu.STAT = (u8) (_mmu.STAT & 0b11111100);
-                            _mmu.STAT = (u8) (_mmu.STAT | 0b00000010);
-                            // 中斷
-                            if (((_mmu.STAT >> 5) & 1) == 1) _mmu.IO[0x0F] = (u8) (_mmu.IO[0x0F] | ((u8) (1 << 1)));
-                            // 重置掃描線
-                            _mmu.LY = 0;
-                        }
+                        _mmu.STAT = (u8) (_mmu.STAT & 0b11111100);
+                        _mmu.STAT = (u8) (_mmu.STAT | 0b00000010);
+                        // 中斷
+                        if (((_mmu.STAT >> 5) & 1) == 1) _mmu.IO[0x0F] = (u8) (_mmu.IO[0x0F] | ((u8) (1 << 1)));
+                        // 重置掃描線
+                        _mmu.LY = 0;
                     }
-                    break;
+                }
             }
+            // OAM 搜尋 ( cycle = 80 )
+            else if (mode == 0b10)
+            {
+                if (_countCycles >= 80)
+                {
+                    // 進到 VRAM --> 修改 STAT 狀態
+                    _mmu.STAT = (u8) (_mmu.STAT & 0b11111100);
+                    _mmu.STAT = (u8) (_mmu.STAT | 0b00000011);
+                    _countCycles -= 80;
+                }
+            }
+            // VRAM 傳輸 ( cycle -> 172)
+            else if (mode == 0b11)
+            {
+                if (_countCycles >= 172)
+                {
+                    // Change State
+                    _mmu.STAT = (u8) (_mmu.STAT & 0b11111100);
+                    _mmu.STAT = (u8) (_mmu.STAT | 0b00000000);
+                    // 中斷
+                    if ((((_mmu.STAT >> 3) & 1 )== 1)) _mmu.IO[0x0F] = (u8) (_mmu.IO[0x0F] | ((u8) (1 << 1)));
 
-            // 設置 coincidence flag
-            if (_mmu.LY == _mmu.LYC) {
-                _mmu.STAT = BitSet(2, _mmu.STAT);
-                if (IsBit(6, _mmu.STAT)) _mmu.RequestInterrupt(1);
-            } else {
-                _mmu.STAT = BitClear(2, _mmu.STAT);
+                    // 繪製掃描線
+                    if (((_mmu.LCDC >> 0) & 1) == 1) BGToBuffer();
+                    if (((_mmu.LCDC >> 5) & 1) == 1 && _mmu.WY <= _mmu.LY) WindowToBuffer();
+                    if (((_mmu.LCDC >> 1) & 1) == 1) SpritesToBuffer();
+
+                    _countCycles -= 172;
+                }
             }
-        } 
-        else {
+        
+            if (_mmu.LY == _mmu.LYC)
+            {
+                _mmu.STAT = (u8) (_mmu.STAT | ((u8) (1 << 2)));
+                // 中斷
+                if (((_mmu.STAT >> 6) & 1) == 1) _mmu.IO[0x0F] = (u8) (_mmu.IO[0x0F] | ((u8) (1 << 1)));
+            }
+            else
+            {
+                _mmu.STAT = (u8) (_mmu.STAT & (~(1 << 2)));
+            }
+        }
+        else
+        {
             _countCycles = 0;
             _mmu.LY = 0;
-            _mmu.STAT = (byte)(_mmu.STAT & ~0x3);
+            _mmu.STAT = (u8) (_mmu.STAT & 0b11111100);
         }
     }
 
-    private void ChangeSTATMode(int mode, MMU _mmu) {
-        byte STAT = (byte)(_mmu.STAT & ~0x3);
-        _mmu.STAT = (byte)(STAT | mode);
 
-        if (mode == 2 && IsBit(5, STAT)) _mmu.RequestInterrupt(1); // OAM 中斷
-        else if (mode == 0 && IsBit(3, STAT)) _mmu.RequestInterrupt(1); // HBLANK 中斷
-        else if (mode == 1 && IsBit(4, STAT)) _mmu.RequestInterrupt(1); // VBLANK 中斷
-    }
-
-    private void DrawScanLine(MMU _mmu) {
-        byte LCDC = _mmu.LCDC;
-        if (IsBit(0, LCDC)) BGToBuffer(_mmu);
-        if (IsBit(5, LCDC) && _mmu.WY <= _mmu.LY) WindowToBuffer(_mmu);
-        if (IsBit(1, LCDC)) SpritesToBuffer(_mmu);
-    }
-
-    private void BGToBuffer(MMU _mmu) {
+    private void BGToBuffer() {
         byte LY = _mmu.LY;
         byte SCY = _mmu.SCY;
         byte SCX = _mmu.SCX;
@@ -159,7 +168,7 @@ public class PPU {
         }
     }
 
-    private void WindowToBuffer(MMU _mmu) {
+    private void WindowToBuffer() {
         byte WY = _mmu.WY;
         byte WX = (byte)(_mmu.WX - 7);
         byte LY = _mmu.LY;
@@ -190,7 +199,7 @@ public class PPU {
         }
     }
 
-    private void SpritesToBuffer(MMU _mmu) {
+    private void SpritesToBuffer() {
         byte LY = _mmu.LY;
         byte LCDC = _mmu.LCDC;
 
