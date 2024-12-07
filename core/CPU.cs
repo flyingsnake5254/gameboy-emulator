@@ -1,7 +1,10 @@
 
 public class CPU
 {
+    public Registers Regs;
+    private Instructions _insc;
     private MMU _mmu;
+    
     private ushort PC;
     private ushort SP;
 
