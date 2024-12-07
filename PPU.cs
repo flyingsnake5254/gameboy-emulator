@@ -250,36 +250,40 @@ public class PPU {
         }
     }
 
-
-    private int GetColorIdBits(int colorBit, u8 l, u8 h) {
-        int hi = (h >> colorBit) & 0x1;
-        int lo = (l >> colorBit) & 0x1;
-        return (hi << 1 | lo);
-    }
-
     private async void Render() {
         Thread.Sleep((int) (17 * (1 / Global.GAME_SPEED)));
         Application.Invoke((sender, args) => _drawingArea.QueueDraw());
     }
 
     private void OnDrawn(object sender, DrawnArgs args) {
-        using (Context cr = args.Cr) {
+        // 使用 Gtk 繪圖 API Cairo
+        using (Context cr = args.Cr)
+        {
+            // 設置抗鋸齒模式
             cr.Antialias = Antialias.None;
-            double scaleX = (double)_drawingArea.AllocatedWidth / Global.SCREEN_WIDTH;
-            double scaleY = (double)_drawingArea.AllocatedHeight / Global.SCREEN_HEIGHT;
 
-            cr.Scale(scaleX, scaleY);
+            // 計算縮放比例
+            cr.Scale(
+                // Scale X
+                (double) _drawingArea.AllocatedWidth / Global.SCREEN_WIDTH,
+                // Scale Y
+                (double) _drawingArea.AllocatedHeight / Global.SCREEN_HEIGHT
+            );
 
-            for (int y = 0; y < Global.SCREEN_HEIGHT; y++) {
-                for (int x = 0; x < Global.SCREEN_WIDTH; x++) {
+            // 繪製
+            for (int y = 0 ; y < Global.SCREEN_HEIGHT ; y ++)
+            {
+                for (int x = 0 ; x < Global.SCREEN_WIDTH ; x ++)
+                {
+                    // 提取 RGB
                     int colorValue = _frameBuffer[x, y];
                     double r = ((colorValue >> 16) & 0xFF) / 255.0;
                     double g = ((colorValue >> 8) & 0xFF) / 255.0;
                     double b = (colorValue & 0xFF) / 255.0;
 
-                    cr.SetSourceRGB(r, g, b);
-                    cr.Rectangle(x, y, 1, 1);
-                    cr.Fill();
+                    cr.SetSourceRGB(r, g, b); // 設置顏色
+                    cr.Rectangle(x, y, 1, 1); // 設置矩形, size : 1, 1
+                    cr.Fill(); // 填充矩形
                 }
             }
         }
