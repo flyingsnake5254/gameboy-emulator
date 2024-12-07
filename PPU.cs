@@ -39,8 +39,11 @@ public class PPU {
             u8 mode = (u8) (_mmu.STAT & 0b00000011);
             switch (mode) {
                 case 2: // OAM 掃描模式
-                    if (_countCycles >= 80) {
-                        ChangeSTATMode(3, _mmu);
+                    if (_countCycles >= 80)
+                    {
+                        // 進到 VRAM --> 修改 STAT 狀態
+                        _mmu.STAT = (u8) (_mmu.STAT & 0b11111100);
+                        _mmu.STAT = (u8) (_mmu.STAT | 0b00000011);
                         _countCycles -= 80;
                     }
                     break;
