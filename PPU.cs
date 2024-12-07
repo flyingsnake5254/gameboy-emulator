@@ -147,19 +147,20 @@ public class PPU {
         u16 tileMapBase = (u16) ((((_mmu.LCDC >> 3) & 1) == 1) ? 0x9C00 : 0x9800);
         u16 tileDataBase = (u16) ((((_mmu.LCDC >> 4) & 1) == 1) ? 0x8000 : 0x8800);
 
-        for (int x = 0; x < Global.SCREEN_WIDTH; x++) {
-            byte pixelX = (byte)((x + _mmu.SCX) & 0xFF);
-            byte pixelY = (byte)((_mmu.LY + _mmu.SCY) & 0xFF);
+        for (int x = 0 ; x < Global.SCREEN_WIDTH ; x ++)
+        {
+            u8 pX = (u8) ((x + _mmu.SCX) & 0b11111111);
+            u8 pY = (u8) ((_mmu.LY + _mmu.SCY) & 0b11111111);
 
-            ushort tileAddress = (ushort)(tileMapBase + (pixelY / 8) * 32 + (pixelX / 8));
+            ushort tileAddress = (ushort)(tileMapBase + (pY / 8) * 32 + (pX / 8));
             sbyte tileId = (sbyte)_mmu.ReadVRAM(tileAddress);
             ushort tileDataAddress = (ushort)(tileDataBase + (IsBit(4, _mmu.LCDC) ? tileId : tileId + 128) * 16);
 
-            byte tileLine = (byte)((pixelY % 8) * 2);
+            byte tileLine = (byte)((pY % 8) * 2);
             byte lo = _mmu.ReadVRAM((ushort)(tileDataAddress + tileLine));
             byte hi = _mmu.ReadVRAM((ushort)(tileDataAddress + tileLine + 1));
 
-            int colorBit = 7 - (pixelX % 8);
+            int colorBit = 7 - (pX % 8);
             int paletteIndex = ((hi >> colorBit) & 1) << 1 | ((lo >> colorBit) & 1);
             _frameBuffer[x, _mmu.LY] = _color[(_mmu.BGP >> (paletteIndex * 2)) & 0x3];
         }
