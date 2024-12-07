@@ -223,21 +223,25 @@ public class PPU {
                 int tileRow = (((attr >> 6) & 1) == 1) ? ((((_mmu.LCDC >> 2) & 1) == 1) ? 16 : 8) - 1 - (_mmu.LY - y) : (_mmu.LY - y);
 
                 u16 tileAddress = (u16)(0x8000 + tile * 16 + tileRow * 2);
-                byte lo = _mmu.VRAM[tileAddress & 0x1FFF];
-                byte hi = _mmu.ReadVRAM((ushort)(tileAddress + 1));
+                u8 low = _mmu.VRAM[tileAddress & 0x1FFF];
+                u8 high = _mmu.VRAM[(tileAddress + 1)  & 0x1FFF];
 
-                for (int p = 0; p < 8; p++) {
-                    int colorBit = IsBit(5, attr) ? p : 7 - p;
-                    int colorId = GetColorIdBits(colorBit, lo, hi);
+                for (int p = 0 ; p < 8 ; p++) 
+                {
+                    int colorBias = (((attr >> 5) & 1) == 1) ? p : 7 - p;
+                    int colorID = (((high >> colorBias) & 0b00000001) << 1) | ((low >> colorBias) & 0b00000001);
 
-                    if (colorId != 0) {
-                        int paletteIndex = (palette >> (colorId * 2)) & 0x3;
+                    if (colorID != 0) 
+                    {
+                        int index = (palette >> (colorID * 2)) & 0x3;
                         int drawX = x + p;
 
                         // 添加邊界檢查
-                        if (drawX >= 0 && drawX < Global.SCREEN_WIDTH && _mmu.LY >= 0 && _mmu.LY < Global.SCREEN_HEIGHT) {
-                            if (aboveBG || _frameBuffer[drawX, _mmu.LY] == _color[0]) {
-                                _frameBuffer[drawX, _mmu.LY] = _color[paletteIndex];
+                        if (drawX >= 0 && drawX < Global.SCREEN_WIDTH && _mmu.LY >= 0 && _mmu.LY < Global.SCREEN_HEIGHT) 
+                        {
+                            if (aboveBG || _frameBuffer[drawX, _mmu.LY] == _color[0]) 
+                            {
+                                _frameBuffer[drawX, _mmu.LY] = _color[index];
                             }
                         }
                     }
