@@ -30,6 +30,9 @@ public class CPU
 
     public CPU(ref MMU mmu) {
         this._mmu = mmu;
+        Regs = new Registers();
+        Regs.Init();
+        _insc = new Instructions(ref Regs, ref _mmu);
         AF = 0x01B0;
         BC = 0x0013;
         DE = 0x00D8;
