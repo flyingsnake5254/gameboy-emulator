@@ -208,23 +208,22 @@ public class PPU {
 
     private void SpritesToBuffer() 
     {
-        // byte LY = _mmu.LY;
-        // byte LCDC = _mmu.LCDC;
+        for (int i = 0x9C ; i >= 0 ; i -= 4) {
+            int y = _mmu.OAM[i] - 16;
+            int x = _mmu.OAM[i + 1] - 8;
 
-        for (int i = 0x9C; i >= 0; i -= 4) {
-            int y = _mmu.ReadOAM(i) - 16;
-            int x = _mmu.ReadOAM(i + 1) - 8;
-            byte tile = _mmu.ReadOAM(i + 2);
-            byte attr = _mmu.ReadOAM(i + 3);
+            u8 tile = _mmu.OAM[i + 2];
+            u8 attr = _mmu.OAM[i + 3];
 
-            if ((_mmu.LY >= y) && (_mmu.LY < y + (IsBit(2, _mmu.LCDC) ? 16 : 8))) {
-                byte palette = IsBit(4, attr) ? _mmu.OBP1 : _mmu.OBP0;
-                bool aboveBG = !IsBit(7, attr);
+            if ((_mmu.LY >= y) && (_mmu.LY < y + ((((_mmu.LCDC >> 2) & 1) == 1) ? 16 : 8))) 
+            {
+                u8 palette = (((attr >> 4) & 1) == 1) ? _mmu.OBP1 : _mmu.OBP0;
+                bool aboveBG = !(((attr >> 7) & 1) == 1);
 
-                int tileRow = IsBit(6, attr) ? (IsBit(2, _mmu.LCDC) ? 16 : 8) - 1 - (_mmu.LY - y) : (_mmu.LY - y);
+                int tileRow = (((attr >> 6) & 1) == 1) ? ((((_mmu.LCDC >> 2) & 1) == 1) ? 16 : 8) - 1 - (_mmu.LY - y) : (_mmu.LY - y);
 
-                ushort tileAddress = (ushort)(0x8000 + tile * 16 + tileRow * 2);
-                byte lo = _mmu.ReadVRAM(tileAddress);
+                u16 tileAddress = (u16)(0x8000 + tile * 16 + tileRow * 2);
+                byte lo = _mmu.VRAM[tileAddress & 0x1FFF];
                 byte hi = _mmu.ReadVRAM((ushort)(tileAddress + 1));
 
                 for (int p = 0; p < 8; p++) {
