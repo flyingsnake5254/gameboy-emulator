@@ -52,27 +52,49 @@ public class PPU {
                     }
                     break;
                 case 0: // HBLANK 模式
-                    if (_countCycles >= 204) {
-                        _mmu.LY = (byte)(_mmu.LY + 1);
+                    if (_countCycles >= 204)
+                    {
+                        _mmu.LY = (u8) (_mmu.LY + 1);
                         _countCycles -= 204;
 
-                        if (_mmu.LY == Global.SCREEN_HEIGHT) {
-                            ChangeSTATMode(1, _mmu);
-                            _mmu.RequestInterrupt(0); // 發送 VBLANK 中斷
-                            RenderFrame(); // 完成一幀後觸發繪製
-                        } else {
-                            ChangeSTATMode(2, _mmu);
+                        if (_mmu.LY == Global.SCREEN_HEIGHT)
+                        {
+                            // Change State
+                            _mmu.STAT = (u8) (_mmu.STAT & 0b11111100);
+                            _mmu.STAT = (u8) (_mmu.STAT | 0b00000001);
+
+                            // 中斷
+                            if ((((_mmu.STAT >> 4) & 1 )== 1)) _mmu.IO[0x0F] = (u8) (_mmu.IO[0x0F] | ((u8) (1 << 1)));
+                            _mmu.IO[0x0F] = (u8) (_mmu.IO[0x0F] | ((u8) (1 << 0)));
+
+                            // 繪製畫面
+                            Render();
+                        }
+                        else
+                        {
+                            // Change State
+                            _mmu.STAT = (u8) (_mmu.STAT & 0b11111100);
+                            _mmu.STAT = (u8) (_mmu.STAT | 0b00000010);
+
+                            // 中斷
+                            if ((((_mmu.STAT >> 5) & 1 )== 1)) _mmu.IO[0x0F] = (u8) (_mmu.IO[0x0F] | ((u8) (1 << 1)));
                         }
                     }
                     break;
                 case 1: // VBLANK 模式
-                    if (_countCycles >= 456) {
-                        _mmu.LY = (byte)(_mmu.LY + 1);
+                    if (_countCycles >= 456)
+                    {
+                        _mmu.LY = (u8) (_mmu.LY + 1);
                         _countCycles -= 456;
 
-                        if (_mmu.LY > 153) {
-                            ChangeSTATMode(2, _mmu);
-                            _mmu.LY = 0; // 重置掃描線
+                        if (_mmu.LY > 153)
+                        {
+                            _mmu.STAT = (u8) (_mmu.STAT & 0b11111100);
+                            _mmu.STAT = (u8) (_mmu.STAT | 0b00000010);
+                            // 中斷
+                            if (((_mmu.STAT >> 5) & 1) == 1) _mmu.IO[0x0F] = (u8) (_mmu.IO[0x0F] | ((u8) (1 << 1)));
+                            // 重置掃描線
+                            _mmu.LY = 0;
                         }
                     }
                     break;
@@ -104,12 +126,12 @@ public class PPU {
 
     private void DrawScanLine(MMU _mmu) {
         byte LCDC = _mmu.LCDC;
-        if (IsBit(0, LCDC)) RenderBG(_mmu);
-        if (IsBit(5, LCDC) && _mmu.WY <= _mmu.LY) RenderWindow(_mmu);
-        if (IsBit(1, LCDC)) RenderSprites(_mmu);
+        if (IsBit(0, LCDC)) BGToBuffer(_mmu);
+        if (IsBit(5, LCDC) && _mmu.WY <= _mmu.LY) WindowToBuffer(_mmu);
+        if (IsBit(1, LCDC)) SpritesToBuffer(_mmu);
     }
 
-    private void RenderBG(MMU _mmu) {
+    private void BGToBuffer(MMU _mmu) {
         byte LY = _mmu.LY;
         byte SCY = _mmu.SCY;
         byte SCX = _mmu.SCX;
@@ -134,7 +156,7 @@ public class PPU {
         }
     }
 
-    private void RenderWindow(MMU _mmu) {
+    private void WindowToBuffer(MMU _mmu) {
         byte WY = _mmu.WY;
         byte WX = (byte)(_mmu.WX - 7);
         byte LY = _mmu.LY;
@@ -165,7 +187,7 @@ public class PPU {
         }
     }
 
-    private void RenderSprites(MMU _mmu) {
+    private void SpritesToBuffer(MMU _mmu) {
         byte LY = _mmu.LY;
         byte LCDC = _mmu.LCDC;
 
@@ -212,7 +234,7 @@ public class PPU {
         return (hi << 1 | lo);
     }
 
-    private async void RenderFrame() {
+    private async void Render() {
         Thread.Sleep((int) (17 * (1 / Global.GAME_SPEED)));
         Application.Invoke((sender, args) => _drawingArea.QueueDraw());
     }
