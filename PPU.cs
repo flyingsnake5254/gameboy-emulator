@@ -7,7 +7,7 @@ public class PPU {
 
     private int[] _color = new int[] { 0x00FFFFFF, 0x00808080, 0x00404040, 0 }; // 調色板顏色
     private DrawingArea _drawingArea;
-    private int[,] _frameBuffer = new int[Global.WINDOW_WIDTH, Global.WINDOW_HEIGHT];
+    private int[,] _frameBuffer = new int[Global.SCREEN_WIDTH, Global.SCREEN_HEIGHT];
     private int _scanlineCounter;
 
     public PPU(DrawingArea drawingArea) {
@@ -55,7 +55,7 @@ public class PPU {
                         mmu.SetLY((byte)(mmu.GetLY() + 1));
                         _scanlineCounter -= 204;
 
-                        if (mmu.GetLY() == Global.WINDOW_HEIGHT) {
+                        if (mmu.GetLY() == Global.SCREEN_HEIGHT) {
                             ChangeSTATMode(1, mmu);
                             mmu.RequestInterrupt(0); // 發送 VBLANK 中斷
                             RenderFrame(); // 完成一幀後觸發繪製
@@ -115,7 +115,7 @@ public class PPU {
         ushort tileMapBase = GetBGTileMapAddress(mmu.GetLCDC());
         ushort tileDataBase = IsBit(4, mmu.GetLCDC()) ? (ushort)0x8000 : (ushort)0x8800;
 
-        for (int x = 0; x < Global.WINDOW_WIDTH; x++) {
+        for (int x = 0; x < Global.SCREEN_WIDTH; x++) {
             byte pixelX = (byte)((x + SCX) & 0xFF);
             byte pixelY = (byte)((LY + SCY) & 0xFF);
 
@@ -144,7 +144,7 @@ public class PPU {
 
             byte windowY = (byte)(LY - WY);
 
-            for (int x = 0; x < Global.WINDOW_WIDTH; x++) {
+            for (int x = 0; x < Global.SCREEN_WIDTH; x++) {
                 if (x >= WX) {
                     byte windowX = (byte)(x - WX);
 
@@ -193,7 +193,7 @@ public class PPU {
                         int drawX = x + p;
 
                         // 添加邊界檢查
-                        if (drawX >= 0 && drawX < Global.WINDOW_WIDTH && LY >= 0 && LY < Global.WINDOW_HEIGHT) {
+                        if (drawX >= 0 && drawX < Global.SCREEN_WIDTH && LY >= 0 && LY < Global.SCREEN_HEIGHT) {
                             if (aboveBG || _frameBuffer[drawX, LY] == _color[0]) {
                                 _frameBuffer[drawX, LY] = _color[paletteIndex];
                             }
@@ -219,13 +219,13 @@ public class PPU {
     private void OnDrawn(object sender, DrawnArgs args) {
         using (Context cr = args.Cr) {
             cr.Antialias = Antialias.None;
-            double scaleX = (double)_drawingArea.AllocatedWidth / Global.WINDOW_WIDTH;
-            double scaleY = (double)_drawingArea.AllocatedHeight / Global.WINDOW_HEIGHT;
+            double scaleX = (double)_drawingArea.AllocatedWidth / Global.SCREEN_WIDTH;
+            double scaleY = (double)_drawingArea.AllocatedHeight / Global.SCREEN_HEIGHT;
 
             cr.Scale(scaleX, scaleY);
 
-            for (int y = 0; y < Global.WINDOW_HEIGHT; y++) {
-                for (int x = 0; x < Global.WINDOW_WIDTH; x++) {
+            for (int y = 0; y < Global.SCREEN_HEIGHT; y++) {
+                for (int x = 0; x < Global.SCREEN_WIDTH; x++) {
                     int colorValue = _frameBuffer[x, y];
                     double r = ((colorValue >> 16) & 0xFF) / 255.0;
                     double g = ((colorValue >> 8) & 0xFF) / 255.0;
