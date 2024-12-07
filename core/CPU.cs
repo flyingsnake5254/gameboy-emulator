@@ -33,12 +33,12 @@ public class CPU
         Regs = new Registers();
         Regs.Init();
         _insc = new Instructions(ref Regs, ref _mmu);
-        AF = 0x01B0;
-        BC = 0x0013;
-        DE = 0x00D8;
-        HL = 0x014d;
-        SP = 0xFFFE;
-        PC = 0x100;
+        AF = Regs.AF;
+        BC = Regs.BC;
+        DE = Regs.DE;
+        HL = Regs.HL;
+        SP = Regs.SP;
+        PC = Regs.PC;
     }
     private long tick = 0;
 
@@ -99,7 +99,7 @@ public class CPU
         //     Array.Clear(outputs);
         // }
         switch (opcode) {
-            case 0x00: return _insc.Execute(opcode);                               break; //NOP        1 4     ----
+            case 0x00:                              break; //NOP        1 4     ----
             case 0x01: BC = _mmu.ReadROM16(PC); PC += 2;      break; //LD BC,D16  3 12    ----
             case 0x02: _mmu.Write(BC, A);                break; //LD (BC),A  1 8     ----
             case 0x03: BC += 1;                             break; //INC BC     1 8     ----
