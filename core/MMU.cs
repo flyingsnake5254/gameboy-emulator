@@ -9,6 +9,23 @@ public class MMU
     public u8[] OAM = new u8[0xFE9F - 0xFE00 + 1];
     private u8[] HRAM = new u8[0x80];
 
+    public u8 IFRegister { get { return IO[0x0F]; } set { IO[0x0F] = value; }}
+    public u8 LY { get { return IO[0x44]; } set { IO[0x44] = value; }}
+    public u8 LCDC { get { return IO[0x40]; } set { IO[0x40] = value;}}
+    public u8 STAT { get { return IO[0x41]; } set { IO[0x41] = value; }}
+    public u8 SCX { get { return IO[0x43]; } set { IO[0x43] = value; }}
+    public u8 SCY { get { return IO[0x42]; } set { IO[0x42] = value; }}
+    public u8 BGP { get { return IO[0x47]; } set { IO[0x47] = value; }}
+    public u8 WY { get { return IO[0x4A]; } set { IO[0x4A] = value; }}
+    public u8 WX { get { return IO[0x4B]; } set { IO[0x4B] = value; }}
+    public u8 OBP1 { get { return IO[0x49]; } set { IO[0x49] = value; }}
+    public u8 OBP0 { get { return IO[0x48]; } set { IO[0x48] = value; }}
+    public u8 LYC { get { return IO[0x45]; } set { IO[0x45] = value; }}
+    public u8 DIV { get { return IO[0x04]; } set { IO[0x04] = value; }}
+    public u8 TAC { get { return IO[0x07]; } set { IO[0x07] = value; }}
+    public u8 TIMA { get { return IO[0x05]; } set { IO[0x05] = value; }}
+    public u8 JOYPAD { get { return IO[0x00]; } set { IO[0x00] = value; }}
+
     private IMBC _mbc;
     
 
@@ -63,7 +80,7 @@ public class MMU
         else
         {
             return 0xFF;
-        }return _mbc.ReadROM(address);
+        }
 
     }
 
@@ -339,16 +356,6 @@ public class MMU
     public void SetWY(u8 value)
     {
         IO[0x4A] = value;
-    }
-
-    public u8 GetWX()
-    {
-        return IO[0x4B]; 
-    }
-
-    public void SetWX(u8 value)
-    {
-        IO[0x4B] = value;
     }
 
     public u8 ReadVRAM(u16 address)

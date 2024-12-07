@@ -135,7 +135,7 @@ public class PPU {
 
     private void RenderWindow(MMU mmu) {
         byte WY = mmu.GetWY();
-        byte WX = (byte)(mmu.GetWX() - 7);
+        byte WX = (byte)(mmu.WX - 7);
         byte LY = mmu.GetLY();
 
         if (LY >= WY) {
