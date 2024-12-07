@@ -159,12 +159,13 @@ public class PPU {
             sbyte tileID = (sbyte) (_mmu.VRAM[tileAddress & 0x1FFF]);
             u16 tileDataAddress = (u16) (tileDataBase + ((((_mmu.LCDC >> 4) & 1) == 1) ? tileID : tileID + 128) * 16);
 
-            byte tileLine = (byte)((pY % 8) * 2);
-            byte lo = _mmu.ReadVRAM((ushort)(tileDataAddress + tileLine));
-            byte hi = _mmu.ReadVRAM((ushort)(tileDataAddress + tileLine + 1));
+            // 當前像素在 Tile 中的垂直偏移量
+            u8 tileLine = (u8) ((pY % 8) * 2);
+            u8 low = _mmu.VRAM[(tileDataAddress + tileLine) & 0x1FFF];
+            u8 high = _mmu.VRAM[(tileDataAddress + tileLine + 1) & 0x1FFF];
 
             int colorBit = 7 - (pX % 8);
-            int paletteIndex = ((hi >> colorBit) & 1) << 1 | ((lo >> colorBit) & 1);
+            int paletteIndex = ((high >> colorBit) & 1) << 1 | ((low >> colorBit) & 1);
             _frameBuffer[x, _mmu.LY] = _color[(_mmu.BGP >> (paletteIndex * 2)) & 0x3];
         }
     }
