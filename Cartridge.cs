@@ -1,4 +1,3 @@
-using u8 = System.Byte;
 public class Cartridge
 {
     private u8[] _rom;

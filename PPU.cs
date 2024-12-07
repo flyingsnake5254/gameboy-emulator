@@ -1,8 +1,7 @@
 using Gtk;
 using Cairo;
 using System.Runtime.CompilerServices;
-using u8 = System.Byte;
-using u16 = System.UInt16;
+
 
 public class PPU {
 

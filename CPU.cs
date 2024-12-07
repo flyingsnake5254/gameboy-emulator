@@ -1,4 +1,4 @@
-using u8 = System.Byte;
+
 public class CPU
 {
     private MMU mmu;

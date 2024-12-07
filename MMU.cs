@@ -1,5 +1,4 @@
-using u8 = System.Byte;
-using u16 = System.UInt16;
+
 public class MMU
 {
     private u8[] IO = new u8[0x80];

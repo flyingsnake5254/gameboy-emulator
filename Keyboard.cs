@@ -25,7 +25,7 @@ This is the matrix layout for register $FF00:
     | |
 */
 using Gdk;
-using u8 = System.Byte;
+
 
 public class Keyboard
 {

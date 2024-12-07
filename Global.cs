@@ -1,8 +1,8 @@
 /*
     Data Type
 */
-// global using u8 = System.Byte;
-// global using u16 = System.UInt16;
+global using u8 = System.Byte;
+global using u16 = System.UInt16;
 public class Global 
 {
     /*

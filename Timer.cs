@@ -25,7 +25,7 @@ DIV 寄存器更新的頻率
     64 週期（65536 Hz）
     256 週期（16384 Hz）
 */
-using u8 = System.Byte;
+
 public class Timer
 {
     private int DIV = 0;
