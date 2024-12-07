@@ -164,9 +164,10 @@ public class PPU {
             u8 low = _mmu.VRAM[(tileDataAddress + tileLine) & 0x1FFF];
             u8 high = _mmu.VRAM[(tileDataAddress + tileLine + 1) & 0x1FFF];
 
-            int colorBit = 7 - (pX % 8);
-            int paletteIndex = ((high >> colorBit) & 1) << 1 | ((low >> colorBit) & 1);
-            _frameBuffer[x, _mmu.LY] = _color[(_mmu.BGP >> (paletteIndex * 2)) & 0x3];
+            // 計算當前像素在行內的水平偏移量
+            int colorBias = 7 - (pX % 8);
+            int index = (((high >> colorBias) & 1) << 1) | ((low >> colorBias) & 1);
+            _frameBuffer[x, _mmu.LY] = _color[(_mmu.BGP >> (index * 2)) & 0x3];
         }
     }
 
