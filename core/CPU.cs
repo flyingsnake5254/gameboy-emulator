@@ -1553,13 +1553,13 @@ private void OR(ref int _cycles, IncsType incsType, string data1 = "")
     }
     private void RET(ref int _cycles, bool flag)
     {
-        if (flag) { PC = POP2(); }
+        if (flag) { PC = POP(ref _cycles); }
         _cycles += 8;
     }
 
     private void RETI(ref int _cycles)
     {
-        PC = POP2();
+        PC = POP(ref _cycles);
         _cycles -= 12; // POP Cycle
         _cycles += 16;
         IME = true;
@@ -1671,7 +1671,7 @@ private void OR(ref int _cycles, IncsType incsType, string data1 = "")
             case "HL": HL = value; break;
             case "AF": AF = value; break;
         }
-        _cycles += 12;
+        if (data1 != "") _cycles += 12;
         return value;
     }
 
