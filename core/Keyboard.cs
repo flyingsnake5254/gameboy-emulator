@@ -51,8 +51,7 @@ public class Keyboard
         else if (e.Key == Gdk.Key.j || e.Key == Gdk.Key.z) { return 0x21; }
         else if (e.Key == Gdk.Key.k || e.Key == Gdk.Key.x) { return 0x22; }
         else if (e.Key == Gdk.Key.space || e.Key == Gdk.Key.c) { return 0x24; }
-        else if (e.Key == Gdk.Key.Return || e.Key == Gdk.Key.v) { 
-            Global.DEBUG = 100; return 0x28; }
+        else if (e.Key == Gdk.Key.Return || e.Key == Gdk.Key.v) { return 0x28; }
         else { return 0; }
     }
     private bool IsBit(int bit, u8 value) {

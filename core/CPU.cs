@@ -23,10 +23,9 @@ public class CPU
     private bool IME;
     private bool IMEEnabler;
     private bool HALTED;
-    private bool HALT_BUG;
+
     private int cycles;
-    private int[] outputs = new int[10000];
-    private int count = 0;
+
 
     public CPU(ref MMU mmu) {
         this._mmu = mmu;
@@ -863,77 +862,77 @@ public class CPU
             case 0xBE: RES(ref cycles, IncsType.MAddr, 0x80); return cycles; //break;
             case 0xBF: RES(ref cycles, IncsType.R8, 0x80, "A"); return cycles; //break;
 
-            case 0xC0: B = SET(0x1, B);                               break; //SET B    2   8   ----
-            case 0xC1: C = SET(0x1, C);                               break; //SET C    2   8   ----
-            case 0xC2: D = SET(0x1, D);                               break; //SET D    2   8   ----
-            case 0xC3: E = SET(0x1, E);                               break; //SET E    2   8   ----
-            case 0xC4: H = SET(0x1, H);                               break; //SET H    2   8   ----
-            case 0xC5: L = SET(0x1, L);                               break; //SET L    2   8   ----
-            case 0xC6: _mmu.Write(HL, SET(0x1, _mmu.Read(HL))); break; //SET (HL) 2   8   ----
-            case 0xC7: A = SET(0x1, A);                               break; //SET B    2   8   ----
+            // 0xC0 ~ 0xCF
+            case 0xC0: SET(ref cycles, IncsType.R8, 0x01, "B"); return cycles; //break;
+            case 0xC1: SET(ref cycles, IncsType.R8, 0x01, "C"); return cycles; //break;
+            case 0xC2: SET(ref cycles, IncsType.R8, 0x01, "D"); return cycles; //break;
+            case 0xC3: SET(ref cycles, IncsType.R8, 0x01, "E"); return cycles; //break;
+            case 0xC4: SET(ref cycles, IncsType.R8, 0x01, "H"); return cycles; //break;
+            case 0xC5: SET(ref cycles, IncsType.R8, 0x01, "L"); return cycles; //break;
+            case 0xC6: SET(ref cycles, IncsType.MAddr, 0x01); return cycles; //break;
+            case 0xC7: SET(ref cycles, IncsType.R8, 0x01, "A"); return cycles; //break;
+            case 0xC8: SET(ref cycles, IncsType.R8, 0x02, "B"); return cycles; //break;
+            case 0xC9: SET(ref cycles, IncsType.R8, 0x02, "C"); return cycles; //break;
+            case 0xCA: SET(ref cycles, IncsType.R8, 0x02, "D"); return cycles; //break;
+            case 0xCB: SET(ref cycles, IncsType.R8, 0x02, "E"); return cycles; //break;
+            case 0xCC: SET(ref cycles, IncsType.R8, 0x02, "H"); return cycles; //break;
+            case 0xCD: SET(ref cycles, IncsType.R8, 0x02, "L"); return cycles; //break;
+            case 0xCE: SET(ref cycles, IncsType.MAddr, 0x02); return cycles; //break;
+            case 0xCF: SET(ref cycles, IncsType.R8, 0x02, "A"); return cycles; //break;
 
-            case 0xC8: B = SET(0x2, B);                               break; //SET B    2   8   ----
-            case 0xC9: C = SET(0x2, C);                               break; //SET C    2   8   ----
-            case 0xCA: D = SET(0x2, D);                               break; //SET D    2   8   ----
-            case 0xCB: E = SET(0x2, E);                               break; //SET E    2   8   ----
-            case 0xCC: H = SET(0x2, H);                               break; //SET H    2   8   ----
-            case 0xCD: L = SET(0x2, L);                               break; //SET L    2   8   ----
-            case 0xCE: _mmu.Write(HL, SET(0x2, _mmu.Read(HL))); break; //SET (HL) 2   8   ----
-            case 0xCF: A = SET(0x2, A);                               break; //SET B    2   8   ----
+            // 0xD0 ~ 0xDF
+            case 0xD0: SET(ref cycles, IncsType.R8, 0x04, "B"); return cycles; //break;
+            case 0xD1: SET(ref cycles, IncsType.R8, 0x04, "C"); return cycles; //break;
+            case 0xD2: SET(ref cycles, IncsType.R8, 0x04, "D"); return cycles; //break;
+            case 0xD3: SET(ref cycles, IncsType.R8, 0x04, "E"); return cycles; //break;
+            case 0xD4: SET(ref cycles, IncsType.R8, 0x04, "H"); return cycles; //break;
+            case 0xD5: SET(ref cycles, IncsType.R8, 0x04, "L"); return cycles; //break;
+            case 0xD6: SET(ref cycles, IncsType.MAddr, 0x04); return cycles; //break;
+            case 0xD7: SET(ref cycles, IncsType.R8, 0x04, "A"); return cycles; //break;
+            case 0xD8: SET(ref cycles, IncsType.R8, 0x08, "B"); return cycles; //break;
+            case 0xD9: SET(ref cycles, IncsType.R8, 0x08, "C"); return cycles; //break;
+            case 0xDA: SET(ref cycles, IncsType.R8, 0x08, "D"); return cycles; //break;
+            case 0xDB: SET(ref cycles, IncsType.R8, 0x08, "E"); return cycles; //break;
+            case 0xDC: SET(ref cycles, IncsType.R8, 0x08, "H"); return cycles; //break;
+            case 0xDD: SET(ref cycles, IncsType.R8, 0x08, "L"); return cycles; //break;
+            case 0xDE: SET(ref cycles, IncsType.MAddr, 0x08); return cycles; //break;
+            case 0xDF: SET(ref cycles, IncsType.R8, 0x08, "A"); return cycles; //break;
 
-            case 0xD0: B = SET(0x4, B);                               break; //SET B    2   8   ----
-            case 0xD1: C = SET(0x4, C);                               break; //SET C    2   8   ----
-            case 0xD2: D = SET(0x4, D);                               break; //SET D    2   8   ----
-            case 0xD3: E = SET(0x4, E);                               break; //SET E    2   8   ----
-            case 0xD4: H = SET(0x4, H);                               break; //SET H    2   8   ----
-            case 0xD5: L = SET(0x4, L);                               break; //SET L    2   8   ----
-            case 0xD6: _mmu.Write(HL, SET(0x4, _mmu.Read(HL))); break; //SET (HL) 2   8   ----
-            case 0xD7: A = SET(0x4, A);                               break; //SET B    2   8   ----
+            // 0xE0 ~ 0xEF
+            case 0xE0: SET(ref cycles, IncsType.R8, 0x10, "B"); return cycles; //break;
+            case 0xE1: SET(ref cycles, IncsType.R8, 0x10, "C"); return cycles; //break;
+            case 0xE2: SET(ref cycles, IncsType.R8, 0x10, "D"); return cycles; //break;
+            case 0xE3: SET(ref cycles, IncsType.R8, 0x10, "E"); return cycles; //break;
+            case 0xE4: SET(ref cycles, IncsType.R8, 0x10, "H"); return cycles; //break;
+            case 0xE5: SET(ref cycles, IncsType.R8, 0x10, "L"); return cycles; //break;
+            case 0xE6: SET(ref cycles, IncsType.MAddr, 0x10); return cycles; //break;
+            case 0xE7: SET(ref cycles, IncsType.R8, 0x10, "A"); return cycles; //break;
+            case 0xE8: SET(ref cycles, IncsType.R8, 0x20, "B"); return cycles; //break;
+            case 0xE9: SET(ref cycles, IncsType.R8, 0x20, "C"); return cycles; //break;
+            case 0xEA: SET(ref cycles, IncsType.R8, 0x20, "D"); return cycles; //break;
+            case 0xEB: SET(ref cycles, IncsType.R8, 0x20, "E"); return cycles; //break;
+            case 0xEC: SET(ref cycles, IncsType.R8, 0x20, "H"); return cycles; //break;
+            case 0xED: SET(ref cycles, IncsType.R8, 0x20, "L"); return cycles; //break;
+            case 0xEE: SET(ref cycles, IncsType.MAddr, 0x20); return cycles; //break;
+            case 0xEF: SET(ref cycles, IncsType.R8, 0x20, "A"); return cycles; //break;
 
-            case 0xD8: B = SET(0x8, B);                               break; //SET B    2   8   ----
-            case 0xD9: C = SET(0x8, C);                               break; //SET C    2   8   ----
-            case 0xDA: D = SET(0x8, D);                               break; //SET D    2   8   ----
-            case 0xDB: E = SET(0x8, E);                               break; //SET E    2   8   ----
-            case 0xDC: H = SET(0x8, H);                               break; //SET H    2   8   ----
-            case 0xDD: L = SET(0x8, L);                               break; //SET L    2   8   ----
-            case 0xDE: _mmu.Write(HL, SET(0x8, _mmu.Read(HL))); break; //SET (HL) 2   8   ----
-            case 0xDF: A = SET(0x8, A);                               break; //SET B    2   8   ----
-
-            case 0xE0: B = SET(0x10, B);                               break; //SET B    2   8   ----
-            case 0xE1: C = SET(0x10, C);                               break; //SET C    2   8   ----
-            case 0xE2: D = SET(0x10, D);                               break; //SET D    2   8   ----
-            case 0xE3: E = SET(0x10, E);                               break; //SET E    2   8   ----
-            case 0xE4: H = SET(0x10, H);                               break; //SET H    2   8   ----
-            case 0xE5: L = SET(0x10, L);                               break; //SET L    2   8   ----
-            case 0xE6: _mmu.Write(HL, SET(0x10, _mmu.Read(HL))); break; //SET (HL) 2   8   ----
-            case 0xE7: A = SET(0x10, A);                               break; //SET B    2   8   ----
-
-            case 0xE8: B = SET(0x20, B);                               break; //SET B    2   8   ----
-            case 0xE9: C = SET(0x20, C);                               break; //SET C    2   8   ----
-            case 0xEA: D = SET(0x20, D);                               break; //SET D    2   8   ----
-            case 0xEB: E = SET(0x20, E);                               break; //SET E    2   8   ----
-            case 0xEC: H = SET(0x20, H);                               break; //SET H    2   8   ----
-            case 0xED: L = SET(0x20, L);                               break; //SET L    2   8   ----
-            case 0xEE: _mmu.Write(HL, SET(0x20, _mmu.Read(HL))); break; //SET (HL) 2   8   ----
-            case 0xEF: A = SET(0x20, A);                               break; //SET B    2   8   ----
-
-            case 0xF0: B = SET(0x40, B);                               break; //SET B    2   8   ----
-            case 0xF1: C = SET(0x40, C);                               break; //SET C    2   8   ----
-            case 0xF2: D = SET(0x40, D);                               break; //SET D    2   8   ----
-            case 0xF3: E = SET(0x40, E);                               break; //SET E    2   8   ----
-            case 0xF4: H = SET(0x40, H);                               break; //SET H    2   8   ----
-            case 0xF5: L = SET(0x40, L);                               break; //SET L    2   8   ----
-            case 0xF6: _mmu.Write(HL, SET(0x40, _mmu.Read(HL))); break; //SET (HL) 2   8   ----
-            case 0xF7: A = SET(0x40, A);                               break; //SET B    2   8   ----
-
-            case 0xF8: B = SET(0x80, B);                               break; //SET B    2   8   ----
-            case 0xF9: C = SET(0x80, C);                               break; //SET C    2   8   ----
-            case 0xFA: D = SET(0x80, D);                               break; //SET D    2   8   ----
-            case 0xFB: E = SET(0x80, E);                               break; //SET E    2   8   ----
-            case 0xFC: H = SET(0x80, H);                               break; //SET H    2   8   ----
-            case 0xFD: L = SET(0x80, L);                               break; //SET L    2   8   ----
-            case 0xFE: _mmu.Write(HL, SET(0x80, _mmu.Read(HL))); break; //SET (HL) 2   8   ----
-            case 0xFF: A = SET(0x80, A);                               break; //SET B    2   8   ----
+            // 0xF0 ~ 0xFF
+            case 0xF0: SET(ref cycles, IncsType.R8, 0x40, "B"); return cycles; //break;
+            case 0xF1: SET(ref cycles, IncsType.R8, 0x40, "C"); return cycles; //break;
+            case 0xF2: SET(ref cycles, IncsType.R8, 0x40, "D"); return cycles; //break;
+            case 0xF3: SET(ref cycles, IncsType.R8, 0x40, "E"); return cycles; //break;
+            case 0xF4: SET(ref cycles, IncsType.R8, 0x40, "H"); return cycles; //break;
+            case 0xF5: SET(ref cycles, IncsType.R8, 0x40, "L"); return cycles; //break;
+            case 0xF6: SET(ref cycles, IncsType.MAddr, 0x40); return cycles; //break;
+            case 0xF7: SET(ref cycles, IncsType.R8, 0x40, "A"); return cycles; //break;
+            case 0xF8: SET(ref cycles, IncsType.R8, 0x80, "B"); return cycles; //break;
+            case 0xF9: SET(ref cycles, IncsType.R8, 0x80, "C"); return cycles; //break;
+            case 0xFA: SET(ref cycles, IncsType.R8, 0x80, "D"); return cycles; //break;
+            case 0xFB: SET(ref cycles, IncsType.R8, 0x80, "E"); return cycles; //break;
+            case 0xFC: SET(ref cycles, IncsType.R8, 0x80, "H"); return cycles; //break;
+            case 0xFD: SET(ref cycles, IncsType.R8, 0x80, "L"); return cycles; //break;
+            case 0xFE: SET(ref cycles, IncsType.MAddr, 0x80); return cycles; //break;
+            case 0xFF: SET(ref cycles, IncsType.R8, 0x80, "A"); return cycles; //break;
 
             default: warnUnsupportedOpcode(opcode); break;
         }
@@ -941,8 +940,28 @@ public class CPU
         return cycles;
     }
 
-    private byte SET(byte b, byte reg) {//----
-        return (byte)(reg | b);
+    private void SET(ref int _cycles, IncsType incsType, u8 bit, string data1 = "")
+    {
+        if (incsType == IncsType.R8)
+        {
+            switch (data1)
+            {
+                case "B": B = (u8) (B | bit); break;
+                case "C": C = (u8) (C | bit); break;
+                case "D": D = (u8) (D | bit); break;
+                case "E": E = (u8) (E | bit); break;
+                case "H": H = (u8) (H | bit); break;
+                case "L": L = (u8) (L | bit); break;
+                case "A": A = (u8) (A | bit); break;
+            }
+
+            _cycles += 8;
+        }
+        else if (incsType == IncsType.MAddr)
+        {
+            _mmu.Write(HL, (u8) (_mmu.Read(HL) | bit));
+            _cycles += 16;
+        }
     }
     private void RES(ref int _cycles, IncsType incsType, u8 bit, string data1 = "")
     {
@@ -968,9 +987,6 @@ public class CPU
         }
     }
 
-    private byte RES2(int b, byte reg) {//----
-        return (byte)(reg & ~b);
-    }
     private void BIT(ref int _cycles, IncsType incsType, u8 bit, string data1 = "")
     {
         if (incsType == IncsType.R8)
@@ -1004,11 +1020,6 @@ public class CPU
         }
     }
 
-    private void BIT2(byte b, byte reg) {//Z01-
-        FlagZ = (reg & b) == 0;
-        FlagN = false;
-        FlagH = true;
-    }
     private void DI(ref int _cycles)
     {
         IME = false;
@@ -1020,14 +1031,6 @@ public class CPU
         _cycles += 4;
     }
 
-    private byte SRL(byte b) {//Z00C
-        byte result = (byte)(b >> 1);
-        SetFlagZ(result);
-        FlagN = false;
-        FlagH = false;
-        FlagC = (b & 0x1) != 0;
-        return result;
-    }
     private void SRL(ref int _cycles, IncsType incsType, string data1 = "")
     {
         if (incsType == IncsType.R8)
@@ -1127,14 +1130,6 @@ private void SWAP(ref int _cycles, IncsType incsType, string data1 = "")
             _cycles += 16;
         }
     }
-    private byte SWAP2(byte b) {//Z000
-        byte result = (byte)((b & 0xF0) >> 4 | (b & 0x0F) << 4);
-        SetFlagZ(result);
-        FlagN = false;
-        FlagH = false;
-        FlagC = false;
-        return result;
-    }
     private void SRA(ref int _cycles, IncsType incsType, string data1 = "")
     {
         if (incsType == IncsType.R8)
@@ -1185,14 +1180,6 @@ private void SWAP(ref int _cycles, IncsType incsType, string data1 = "")
         }
     }
 
-    private byte SRA2(byte b) {//Z00C
-        byte result = (byte)((b >> 1) | ( b & 0x80));
-        SetFlagZ(result);
-        FlagN = false;
-        FlagH = false;
-        FlagC = (b & 0x1) != 0;
-        return result;
-    }
     private void SLA(ref int _cycles, IncsType incsType, string data1 = "")
     {
         if (incsType == IncsType.R8)
@@ -1242,14 +1229,6 @@ private void SWAP(ref int _cycles, IncsType incsType, string data1 = "")
         }
     }
 
-    private byte SLA2(byte b) {//Z00C
-        byte result = (byte)(b << 1);
-        SetFlagZ(result);
-        FlagN = false;
-        FlagH = false;
-        FlagC = (b & 0x80) != 0;
-        return result;
-    }
     private void RR(ref int _cycles, IncsType incsType, string data1 = "")
     {
         if (incsType == IncsType.R8)
@@ -1303,15 +1282,6 @@ private void SWAP(ref int _cycles, IncsType incsType, string data1 = "")
         }
     } 
 
-    private byte RR2(byte b) {//Z00C
-        bool prevC = FlagC;
-        byte result = (byte)((b >> 1) | (prevC ? 0x80 : 0));
-        SetFlagZ(result);
-        FlagN = false;
-        FlagH = false;
-        FlagC = (b & 0x1) != 0;
-        return result;
-    }
     private void RL(ref int _cycles, IncsType incsType, string data1 = "")
     {
         if (incsType == IncsType.R8)
@@ -1365,16 +1335,6 @@ private void SWAP(ref int _cycles, IncsType incsType, string data1 = "")
         }
     }
 
-    private byte RL2(byte b) {//Z00C
-        bool prevC = FlagC;
-        byte result = (byte)((b << 1) | (prevC ? 1 : 0));
-        SetFlagZ(result);
-        FlagN = false;
-        FlagH = false;
-        FlagC = (b & 0x80) != 0;
-        return result;
-    }
-
     private void RRC(ref int _cycles, IncsType incsType, string data1 = "")
     {
         if (incsType == IncsType.R8)
@@ -1422,15 +1382,6 @@ private void SWAP(ref int _cycles, IncsType incsType, string data1 = "")
         }
     }
 
-    private byte RRC2(byte b) {//Z00C
-        byte result = (byte)((b >> 1) | (b << 7));
-        SetFlagZ(result);
-        FlagN = false;
-        FlagH = false;
-        FlagC = (b & 0x1) != 0;
-        return result;
-    }
-
     private void RLC(ref int _cycles, IncsType incsType, string data1 = "")
     {
         if (incsType == IncsType.R8)
@@ -1475,24 +1426,6 @@ private void SWAP(ref int _cycles, IncsType incsType, string data1 = "")
 
             _cycles += 16;
         }
-    }
-
-    private byte RLC2(byte b) {//Z00C
-        byte result = (byte)((b << 1) | (b >> 7));
-        SetFlagZ(result);
-        FlagN = false;
-        FlagH = false;
-        FlagC = (b & 0x80) != 0;
-        return result;
-    }
-
-    private ushort DADr8(ushort w) {//00HC | warning r8 is signed!
-        byte b = _mmu.Read(PC++);
-        FlagZ = false;
-        FlagN = false;
-        SetFlagH((byte)w, b);
-        SetFlagC((byte)w + b);
-        return (ushort)(w + (sbyte)b);
     }
 
     private void JR(bool flag) {
@@ -1598,14 +1531,6 @@ private void SWAP(ref int _cycles, IncsType incsType, string data1 = "")
         }
     }
 
-    private void ADD2(byte b) { //Z0HC
-        int result = A + b;
-        SetFlagZ(result);
-        FlagN = false;
-        SetFlagH(A, b);
-        SetFlagC(result);
-        A = (byte)result;
-    }
     private void ADC(ref int _cycles, IncsType incsType, string data1 = "")
     {
         if (incsType == IncsType.R8_R8)
@@ -1654,18 +1579,6 @@ private void SWAP(ref int _cycles, IncsType incsType, string data1 = "")
         }
     }
 
-    private void ADC2(byte b) { //Z0HC
-        int carry = FlagC ? 1 : 0;
-        int result = A + b + carry;
-        SetFlagZ(result);
-        FlagN = false;
-        if (FlagC)
-            SetFlagHCarry(A, b);
-        else SetFlagH(A, b);
-        SetFlagC(result);
-        A = (byte)result;
-    }
-
     private void SUB(ref int _cycles, IncsType incsType, string data1 = "")
     {
         if (incsType == IncsType.R8)
@@ -1708,14 +1621,6 @@ private void SWAP(ref int _cycles, IncsType incsType, string data1 = "")
             A = (u8) (A - value);
             _cycles += 8;
         }
-    }
-    private void SUB2(byte b) {//Z1HC
-        int result = A - b;
-        SetFlagZ(result);
-        FlagN = true;
-        SetFlagHSub(A, b);
-        SetFlagC(result);
-        A = (byte)result;
     }
     private void SBC(ref int _cycles, IncsType incsType, string data1 = "")
     {
@@ -1767,17 +1672,6 @@ private void SWAP(ref int _cycles, IncsType incsType, string data1 = "")
         }
     }
 
-    private void SBC2(byte b) {//Z1HC
-        int carry = FlagC ? 1 : 0;
-        int result = A - b - carry;
-        SetFlagZ(result);
-        FlagN = true;
-        if (FlagC)
-            SetFlagHSubCarry(A, b);
-        else SetFlagHSub(A, b);
-        SetFlagC(result);
-        A = (byte)result;
-    }
     private void AND(ref int _cycles, IncsType incsType, string data1 = "")
     {
         if (incsType == IncsType.R8)
@@ -1827,14 +1721,6 @@ private void SWAP(ref int _cycles, IncsType incsType, string data1 = "")
         }
     }
 
-    private void AND2(byte b) {//Z010
-        byte result = (byte)(A & b);
-        SetFlagZ(result);
-        FlagN = false;
-        FlagH = true;
-        FlagC = false;
-        A = result;
-    }
     private void XOR(ref int _cycles, IncsType incsType, string data1 = "")
     {
         if (incsType == IncsType.R8)
@@ -1883,14 +1769,6 @@ private void SWAP(ref int _cycles, IncsType incsType, string data1 = "")
         }
     }
 
-    private void XOR2(byte b) {//Z000
-        byte result = (byte)(A ^ b);
-        SetFlagZ(result);
-        FlagN = false;
-        FlagH = false;
-        FlagC = false;
-        A = result;
-    }
 
 private void OR(ref int _cycles, IncsType incsType, string data1 = "")
     {
@@ -1938,14 +1816,6 @@ private void OR(ref int _cycles, IncsType incsType, string data1 = "")
             _cycles += 8;
         }
     }
-    private void OR2(byte b) {//Z000
-        byte result = (byte)(A | b);
-        SetFlagZ(result);
-        FlagN = false;
-        FlagH = false;
-        FlagC = false;
-        A = result;
-    }
 
     private void CP(ref int _cycles, IncsType incsType, string data1 = "")
     {
@@ -1987,13 +1857,6 @@ private void OR(ref int _cycles, IncsType incsType, string data1 = "")
             _cycles += 8;
         }
     }
-    private void CP2(byte b) {//Z1HC
-        int result = A - b;
-        SetFlagZ(result);
-        FlagN = true;
-        SetFlagHSub(A, b);
-        SetFlagC(result);
-    }
 
     private void DAD(ushort w) { //-0HC
         int result = HL + w;
@@ -2014,26 +1877,6 @@ private void OR(ref int _cycles, IncsType incsType, string data1 = "")
         _cycles -= 12; // POP Cycle
         _cycles += 16;
         IME = true;
-    }
-
-    private void RETURN(bool flag) {
-        if (flag) {
-            PC = POP2();
-            cycles += 20;
-        } else {
-            cycles += 8;
-        }
-    }
-
-    private void CALL2(bool flag) {
-        if (flag) {
-            PUSH2((ushort)(PC + 2));
-            PC = _mmu.ReadROM16(PC);
-            cycles += 24;
-        } else {
-            PC += 2;
-            cycles += 12;
-        }
     }
 
     private void CALL(ref int _cycles, bool flag)
@@ -2106,10 +1949,6 @@ private void OR(ref int _cycles, IncsType incsType, string data1 = "")
         }
     }
 
-    private void RST2(byte b) {
-        PUSH2(PC);
-        PC = b;
-    }
 
     private void RST(ref int _cycles, u8 value)
     {
@@ -2126,16 +1965,6 @@ private void OR(ref int _cycles, IncsType incsType, string data1 = "")
         _cycles += 4;
     }
 
-    private void HALT2() {
-        if (!IME) {
-            if ((_mmu.GetIE() & _mmu.IFRegister & 0x1F) == 0) {
-                HALTED = true;
-                PC--;
-            } else {
-                HALT_BUG = true;
-            }
-        }
-    }
 
     public void UpdateIME() {
         IME |= IMEEnabler;
@@ -2148,7 +1977,9 @@ private void OR(ref int _cycles, IncsType incsType, string data1 = "")
             HALTED = false;
         }
         if (IME) {
-            PUSH2(PC);
+            // PUSH2(PC);
+            SP -= 2;
+            _mmu.WriteROM16(SP, PC);
             PC = (ushort)(0x40 + (8 * b));
             IME = false;
             
@@ -2162,22 +1993,8 @@ private void OR(ref int _cycles, IncsType incsType, string data1 = "")
     }
     
 
-    private void PUSH2(ushort w) {// (SP - 1) < -PC.hi; (SP - 2) < -PC.lo
-        SP -= 2;
-        _mmu.WriteROM16(SP, w);
-    }
-
-    private ushort POP2() {
-        ushort ret = _mmu.ReadROM16(SP);
-        SP += 2;
-        //byte l = _mmu.Read(++SP);
-        //byte h = _mmu.Read(++SP);
-        //ushort ret = (ushort)(h << 8 | l);
-        //Console.WriteLine("stack POP = " + ret.ToString("x4") + " SP = " + SP.ToString("x4") + " reading: " + _mmu.ReadROM16(SP).ToString("x4") + "ret = " /*+ ((ushort)(h << 8 | l)).ToString("x4")*/);
 
 
-        return ret;
-    }
     private u16 POP(ref int _cycles, string data1 = "")
     {
         u16 value = _mmu.ReadROM16(SP);
