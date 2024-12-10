@@ -378,7 +378,7 @@ public class CPU
             case 0xC2: JP(ref cycles, !FlagZ); return cycles; //JUMP(!FlagZ);               break; //JP NZ,A16   3 16/12 ----
             case 0xC3: JP(ref cycles, true); return cycles; //JUMP(true);                 break; //JP A16      3 16    ----
             case 0xC4: CALL(!FlagZ);               break; //CALL NZ A16 3 24/12 ----
-            case 0xC5: PUSH(BC);                   break; //PUSH BC     1 16    ----
+            case 0xC5: PUSH(ref cycles, "BC");return cycles;//PUSH(BC);                   break; //PUSH BC     1 16    ----
             case 0xC6: ADD(ref cycles, IncsType.R8_D8); return cycles; break;//ADD(_mmu.Read(PC)); PC += 1;  break; //ADD A,D8    2 8     Z0HC
             case 0xC7: RST(0x0);                   break; //RST 0       1 16    ----
 
@@ -396,7 +396,7 @@ public class CPU
             case 0xD2: JP(ref cycles, !FlagC); return cycles; //JUMP(!FlagC);               break; //JP NC,A16   3 16/12 ----
             //case 0xD3:                                break; //Illegal Opcode
             case 0xD4: CALL(!FlagC);               break; //CALL NC,A16 3 24/12 ----
-            case 0xD5: PUSH(DE);                   break; //PUSH DE     1 16    ----
+            case 0xD5: PUSH(ref cycles, "DE");return cycles;//PUSH(DE);                   break; //PUSH DE     1 16    ----
             case 0xD6: SUB(ref cycles, IncsType.D8); return cycles;break;//SUB(_mmu.Read(PC)); PC += 1;  break; //SUB D8      2 8     ----
             case 0xD7: RST(0x10);                  break; //RST 2 10    1 16    ----
 
@@ -419,7 +419,7 @@ public class CPU
             case 0xE2: _mmu.Write((ushort)(0xFF00 + C), A);   break; //LD (C),A   1 8  ----
             //case 0xE3:                                break; //Illegal Opcode
             //case 0xE4:                                break; //Illegal Opcode
-            case 0xE5: PUSH(HL);                   break; //PUSH HL     1 16    ----
+            case 0xE5: PUSH(ref cycles, "HL");return cycles;//PUSH(HL);                   break; //PUSH HL     1 16    ----
             case 0xE6: AND(ref cycles, IncsType.D8); return cycles;//AND(_mmu.Read(PC)); PC += 1;  break; //AND D8      2 8     Z010
             case 0xE7: RST(0x20);                  break; //RST 4 20    1 16    ----
 
@@ -437,7 +437,7 @@ public class CPU
             case 0xF2: A = _mmu.Read((ushort)(0xFF00 + C));  break; //LD A,(C)    1 8     ----
             case 0xF3: IME = false;                     break; //DI          1 4     ----
             //case 0xF4:                                break; //Illegal Opcode
-            case 0xF5: PUSH(AF);                   break; //PUSH AF     1 16    ----
+            case 0xF5: PUSH(ref cycles, "AF");return cycles;//PUSH(AF);                   break; //PUSH AF     1 16    ----
             case 0xF6: OR(ref cycles, IncsType.D8); return cycles; //OR(_mmu.Read(PC)); PC += 1;   break; //OR D8       2 8     Z000
             case 0xF7: RST(0x30);                  break; //RST 6 30    1 16    ----
 
@@ -1576,12 +1576,42 @@ private void OR(ref int _cycles, IncsType incsType, string data1 = "")
 
     private void CALL(bool flag) {
         if (flag) {
-            PUSH((ushort)(PC + 2));
+            PUSH2((ushort)(PC + 2));
             PC = _mmu.ReadROM16(PC);
             cycles += 24;
         } else {
             PC += 2;
             cycles += 12;
+        }
+    }
+
+    private void PUSH(ref int _cycles, string data1, IncsType incsType = IncsType.R16, u16 number = 0)
+    {
+        if (incsType == IncsType.R16)
+        {
+            u16 value = 0;
+            switch (data1)
+            {
+                case "BC": value = BC; break;
+                case "DE": value = DE; break;
+                case "HL": value = HL; break;
+                case "AF": value = AF; break;
+            }
+
+            SP -= 2;
+            _mmu.WriteROM16(SP, value);
+            _cycles += 16;
+        }
+        else if (incsType == IncsType.A16)
+        {
+            SP -= 2;
+            _mmu.WriteROM16(SP, number);
+            _cycles += 16;
+        }
+        else if (incsType == IncsType.NO_CYCLE)
+        {
+            SP -= 2;
+            _mmu.WriteROM16(SP, number);
         }
     }
 
@@ -1610,7 +1640,7 @@ private void OR(ref int _cycles, IncsType incsType, string data1 = "")
     }
 
     private void RST(byte b) {
-        PUSH(PC);
+        PUSH2(PC);
         PC = b;
     }
 
@@ -1643,7 +1673,7 @@ private void OR(ref int _cycles, IncsType incsType, string data1 = "")
             HALTED = false;
         }
         if (IME) {
-            PUSH(PC);
+            PUSH2(PC);
             PC = (ushort)(0x40 + (8 * b));
             IME = false;
             
@@ -1657,7 +1687,7 @@ private void OR(ref int _cycles, IncsType incsType, string data1 = "")
     }
     
 
-    private void PUSH(ushort w) {// (SP - 1) < -PC.hi; (SP - 2) < -PC.lo
+    private void PUSH2(ushort w) {// (SP - 1) < -PC.hi; (SP - 2) < -PC.lo
         SP -= 2;
         _mmu.WriteROM16(SP, w);
     }
