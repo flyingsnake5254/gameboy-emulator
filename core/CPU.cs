@@ -681,14 +681,14 @@ public class CPU
             case 0x16: RL(ref cycles, IncsType.MAddr); return cycles; // _mmu.Write(HL, RL(_mmu.Read(HL)));     break; //RL (HL)  2   8   Z00C
             case 0x17: RL(ref cycles, IncsType.R8, "A"); return cycles; //A = RL(A);                                   break; //RL B     2   8   Z00C
                                                                                             
-            case 0x18: B = RR(B);                                   break; //RR B     2   8   Z00C
-            case 0x19: C = RR(C);                                   break; //RR C     2   8   Z00C
-            case 0x1A: D = RR(D);                                   break; //RR D     2   8   Z00C
-            case 0x1B: E = RR(E);                                   break; //RR E     2   8   Z00C
-            case 0x1C: H = RR(H);                                   break; //RR H     2   8   Z00C
-            case 0x1D: L = RR(L);                                   break; //RR L     2   8   Z00C
-            case 0x1E: _mmu.Write(HL, RR(_mmu.Read(HL)));     break; //RR (HL)  2   8   Z00C
-            case 0x1F: A = RR(A);                                   break; //RR B     2   8   Z00C
+            case 0x18: RR(ref cycles, IncsType.R8, "B"); return cycles; //B = RR(B);                                   break; //RR B     2   8   Z00C
+            case 0x19: RR(ref cycles, IncsType.R8, "C"); return cycles; //C = RR(C);                                   break; //RR C     2   8   Z00C
+            case 0x1A: RR(ref cycles, IncsType.R8, "D"); return cycles; //D = RR(D);                                   break; //RR D     2   8   Z00C
+            case 0x1B: RR(ref cycles, IncsType.R8, "E"); return cycles; //E = RR(E);                                   break; //RR E     2   8   Z00C
+            case 0x1C: RR(ref cycles, IncsType.R8, "H"); return cycles; //H = RR(H);                                   break; //RR H     2   8   Z00C
+            case 0x1D: RR(ref cycles, IncsType.R8, "L"); return cycles; //L = RR(L);                                   break; //RR L     2   8   Z00C
+            case 0x1E: RR(ref cycles, IncsType.MAddr); return cycles; //_mmu.Write(HL, RR(_mmu.Read(HL)));     break; //RR (HL)  2   8   Z00C
+            case 0x1F: RR(ref cycles, IncsType.R8, "A"); return cycles; //A = RR(A);                                   break; //RR B     2   8   Z00C
                                                                         
             case 0x20: B = SLA(B);                                  break; //SLA B    2   8   Z00C
             case 0x21: C = SLA(C);                                  break; //SLA C    2   8   Z00C
@@ -1007,8 +1007,60 @@ public class CPU
         FlagC = (b & 0x80) != 0;
         return result;
     }
+    private void RR(ref int _cycles, IncsType incsType, string data1 = "")
+    {
+        if (incsType == IncsType.R8)
+        {
+            bool oldC = FlagC;
+            u8 value = 0;
+            switch (data1)
+            {
+                case "B": value = B; break;
+                case "C": value = C; break;
+                case "D": value = D; break;
+                case "E": value = E; break;
+                case "H": value = H; break;
+                case "L": value = L; break;
+                case "A": value = A; break;
+            }
 
-    private byte RR(byte b) {//Z00C
+            u8 result = (u8) ((value >> 1) | (oldC ? 0x80 : 0));
+
+            SetFlagZ(result);
+            FlagN = false;
+            FlagH = false;
+            FlagC = (value & 0x01) != 0;
+
+            switch (data1)
+            {
+                case "B": B = result; break;
+                case "C": C = result; break;
+                case "D": D = result; break;
+                case "E": E = result; break;
+                case "H": H = result; break;
+                case "L": L = result; break;
+                case "A": A = result; break;
+            }
+
+            _cycles += 8;
+        }
+        else if (incsType == IncsType.MAddr)
+        {
+            bool oldC = FlagC;
+            u8 value = _mmu.Read(HL);
+            u8 result = (u8) ((value >> 1) | (oldC ? 0x80 : 0));
+
+            SetFlagZ(result);
+            FlagN = false;
+            FlagH = false;
+            FlagC = (value & 0x01) != 0;
+            _mmu.Write(HL, result);
+
+            _cycles += 16;
+        }
+    } 
+
+    private byte RR2(byte b) {//Z00C
         bool prevC = FlagC;
         byte result = (byte)((b >> 1) | (prevC ? 0x80 : 0));
         SetFlagZ(result);
