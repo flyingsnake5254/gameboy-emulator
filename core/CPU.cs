@@ -377,37 +377,37 @@ public class CPU
             case 0xC1: POP(ref cycles, "BC"); return cycles; //BC = POP();                   break; //POP BC      1 12    ----
             case 0xC2: JP(ref cycles, !FlagZ); return cycles; //JUMP(!FlagZ);               break; //JP NZ,A16   3 16/12 ----
             case 0xC3: JP(ref cycles, true); return cycles; //JUMP(true);                 break; //JP A16      3 16    ----
-            case 0xC4: CALL(!FlagZ);               break; //CALL NZ A16 3 24/12 ----
+            case 0xC4: CALL(ref cycles, !FlagZ); return cycles;//CALL(!FlagZ);               break; //CALL NZ A16 3 24/12 ----
             case 0xC5: PUSH(ref cycles, "BC");return cycles;//PUSH(BC);                   break; //PUSH BC     1 16    ----
             case 0xC6: ADD(ref cycles, IncsType.R8_D8); return cycles; break;//ADD(_mmu.Read(PC)); PC += 1;  break; //ADD A,D8    2 8     Z0HC
-            case 0xC7: RST(0x0);                   break; //RST 0       1 16    ----
+            case 0xC7: RST(ref cycles,0x0); return cycles; //RST(0x0);                   break; //RST 0       1 16    ----
 
             case 0xC8: RET(ref cycles, FlagZ); return cycles;//RETURN(FlagZ);              break; //RET Z       1 20/8  ----
             case 0xC9: RET(ref cycles, true); return cycles;// RETURN(true);               break; //RET         1 16    ----
             case 0xCA: JP(ref cycles, FlagZ); return cycles; //               break; //JP Z,A16    3 16/12 ----
             case 0xCB: PREFIX_CB(_mmu.Read(PC++));      break; //PREFIX CB OPCODE TABLE
-            case 0xCC: CALL(FlagZ);                break; //CALL Z,A16  3 24/12 ----
-            case 0xCD: CALL(true);                 break; //CALL A16    3 24    ----
+            case 0xCC: CALL(ref cycles, FlagZ); return cycles;//CALL(FlagZ);                break; //CALL Z,A16  3 24/12 ----
+            case 0xCD: CALL(ref cycles, true); return cycles;//CALL(true);                 break; //CALL A16    3 24    ----
             case 0xCE: ADC(ref cycles, IncsType.R8_D8); return cycles; break;//ADC(_mmu.Read(PC)); PC += 1;  break; //ADC A,D8    2 8     ----
-            case 0xCF: RST(0x8);                   break; //RST 1 08    1 16    ----
+            case 0xCF: RST(ref cycles,0x8); return cycles; //RST(0x8);                   break; //RST 1 08    1 16    ----
 
             case 0xD0: RET(ref cycles, !FlagC); return cycles;//RETURN(!FlagC);             break; //RET NC      1 20/8  ----
             case 0xD1: POP(ref cycles, "DE"); return cycles; //DE = POP();                   break; //POP DE      1 12    ----
             case 0xD2: JP(ref cycles, !FlagC); return cycles; //JUMP(!FlagC);               break; //JP NC,A16   3 16/12 ----
             //case 0xD3:                                break; //Illegal Opcode
-            case 0xD4: CALL(!FlagC);               break; //CALL NC,A16 3 24/12 ----
+            case 0xD4: CALL(ref cycles, !FlagC); return cycles;//CALL(!FlagC);               break; //CALL NC,A16 3 24/12 ----
             case 0xD5: PUSH(ref cycles, "DE");return cycles;//PUSH(DE);                   break; //PUSH DE     1 16    ----
             case 0xD6: SUB(ref cycles, IncsType.D8); return cycles;break;//SUB(_mmu.Read(PC)); PC += 1;  break; //SUB D8      2 8     ----
-            case 0xD7: RST(0x10);                  break; //RST 2 10    1 16    ----
+            case 0xD7: RST(ref cycles,0x10); return cycles; //RST(0x10);                  break; //RST 2 10    1 16    ----
 
             case 0xD8: RET(ref cycles, FlagC); return cycles;//RETURN(FlagC);              break; //RET C       1 20/8  ----
             case 0xD9: RETI(ref cycles); return cycles; //RETURN(true); IME = true;   break; //RETI        1 16    ----
             case 0xDA: JP(ref cycles, FlagC); return cycles; //JUMP(FlagC);                break; //JP C,A16    3 16/12 ----
             //case 0xDB:                                break; //Illegal Opcode
-            case 0xDC: CALL(FlagC);                break; //Call C,A16  3 24/12 ----
+            case 0xDC: CALL(ref cycles, FlagC); return cycles;//CALL(FlagC);                break; //Call C,A16  3 24/12 ----
             //case 0xDD:                                break; //Illegal Opcode
             case 0xDE: SBC(ref cycles, IncsType.R8_D8); return cycles;//SBC(_mmu.Read(PC)); PC += 1;  break; //SBC A,A8    2 8     Z1HC
-            case 0xDF: RST(0x18);                  break; //RST 3 18    1 16    ----
+            case 0xDF: RST(ref cycles,0x18); return cycles; //RST(0x18);                  break; //RST 3 18    1 16    ----
 
             case 0xE0:  //LDH (A8),A 2 12 ----
                 ushort value1 = (ushort)(0xFF00 + _mmu.Read(PC));
@@ -421,7 +421,7 @@ public class CPU
             //case 0xE4:                                break; //Illegal Opcode
             case 0xE5: PUSH(ref cycles, "HL");return cycles;//PUSH(HL);                   break; //PUSH HL     1 16    ----
             case 0xE6: AND(ref cycles, IncsType.D8); return cycles;//AND(_mmu.Read(PC)); PC += 1;  break; //AND D8      2 8     Z010
-            case 0xE7: RST(0x20);                  break; //RST 4 20    1 16    ----
+            case 0xE7: RST(ref cycles,0x20); return cycles; //RST(0x20);                  break; //RST 4 20    1 16    ----
 
             case 0xE8: SP = DADr8(SP);             break; //ADD SP,R8   2 16    00HC
             case 0xE9: PC = HL;                         break; //JP (HL)     1 4     ----
@@ -430,7 +430,7 @@ public class CPU
             //case 0xEC:                                break; //Illegal Opcode
             //case 0xED:                                break; //Illegal Opcode
             case 0xEE: XOR(ref cycles, IncsType.D8); return cycles; //XOR2(_mmu.Read(PC)); PC += 1;  break; //XOR D8      2 8     Z000
-            case 0xEF: RST(0x28);                  break; //RST 5 28    1 16    ----
+            case 0xEF: RST(ref cycles,0x28); return cycles; //RST(0x28);                  break; //RST 5 28    1 16    ----
 
             case 0xF0: A = _mmu.Read((ushort)(0xFF00 + _mmu.Read(PC))); PC += 1;  break; //LDH A,(A8)  2 12    ----
             case 0xF1: POP(ref cycles, "AF"); return cycles; //AF = POP();                   break; //POP AF      1 12    ZNHC
@@ -439,7 +439,7 @@ public class CPU
             //case 0xF4:                                break; //Illegal Opcode
             case 0xF5: PUSH(ref cycles, "AF");return cycles;//PUSH(AF);                   break; //PUSH AF     1 16    ----
             case 0xF6: OR(ref cycles, IncsType.D8); return cycles; //OR(_mmu.Read(PC)); PC += 1;   break; //OR D8       2 8     Z000
-            case 0xF7: RST(0x30);                  break; //RST 6 30    1 16    ----
+            case 0xF7: RST(ref cycles,0x30); return cycles; //RST(0x30);                  break; //RST 6 30    1 16    ----
 
             case 0xF8: HL = DADr8(SP);             break; //LD HL,SP+R8 2 12    00HC
             case 0xF9: SP = HL;                         break; //LD SP,HL    1 8     ----
@@ -448,7 +448,7 @@ public class CPU
             //case 0xFC:                                break; //Illegal Opcode
             //case 0xFD:                                break; //Illegal Opcode
             case 0xFE: CP(ref cycles, IncsType.D8); return cycles; //CP(_mmu.Read(PC)); PC += 1;   break; //CP D8       2 8     Z1HC
-            case 0xFF: RST(0x38);                  break; //RST 7 38    1 16    ----
+            case 0xFF: RST(ref cycles,0x38); return cycles; //RST(0x38);                  break; //RST 7 38    1 16    ----
 
             default: warnUnsupportedOpcode(opcode);     break;
         }
@@ -1574,7 +1574,7 @@ private void OR(ref int _cycles, IncsType incsType, string data1 = "")
         }
     }
 
-    private void CALL(bool flag) {
+    private void CALL2(bool flag) {
         if (flag) {
             PUSH2((ushort)(PC + 2));
             PC = _mmu.ReadROM16(PC);
@@ -1582,6 +1582,22 @@ private void OR(ref int _cycles, IncsType incsType, string data1 = "")
         } else {
             PC += 2;
             cycles += 12;
+        }
+    }
+
+    private void CALL(ref int _cycles, bool flag)
+    {
+        if (flag)
+        {
+            PUSH(ref _cycles, "", IncsType.A16, (u16) (PC + 2));
+            _cycles -= 16; // PUSH Cycle
+            PC = _mmu.ReadROM16(PC);
+            _cycles += 24;
+        }
+        else
+        {
+            PC += 2;
+            _cycles += 12;
         }
     }
 
@@ -1639,9 +1655,17 @@ private void OR(ref int _cycles, IncsType incsType, string data1 = "")
         }
     }
 
-    private void RST(byte b) {
+    private void RST2(byte b) {
         PUSH2(PC);
         PC = b;
+    }
+
+    private void RST(ref int _cycles, u8 value)
+    {
+        PUSH(ref _cycles, "", IncsType.A16, PC);
+        PC = value;
+        _cycles -= 16; // PUSH Cycle
+        _cycles += 16;
     }
 
 
