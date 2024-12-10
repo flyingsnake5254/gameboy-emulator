@@ -690,14 +690,14 @@ public class CPU
             case 0x1E: RR(ref cycles, IncsType.MAddr); return cycles; //_mmu.Write(HL, RR(_mmu.Read(HL)));     break; //RR (HL)  2   8   Z00C
             case 0x1F: RR(ref cycles, IncsType.R8, "A"); return cycles; //A = RR(A);                                   break; //RR B     2   8   Z00C
                                                                         
-            case 0x20: B = SLA(B);                                  break; //SLA B    2   8   Z00C
-            case 0x21: C = SLA(C);                                  break; //SLA C    2   8   Z00C
-            case 0x22: D = SLA(D);                                  break; //SLA D    2   8   Z00C
-            case 0x23: E = SLA(E);                                  break; //SLA E    2   8   Z00C
-            case 0x24: H = SLA(H);                                  break; //SLA H    2   8   Z00C
-            case 0x25: L = SLA(L);                                  break; //SLA L    2   8   Z00C
-            case 0x26: _mmu.Write(HL, SLA(_mmu.Read(HL)));    break; //SLA (HL) 2   8   Z00C
-            case 0x27: A = SLA(A);                                  break; //SLA B    2   8   Z00C
+            case 0x20: SLA(ref cycles, IncsType.R8, "B"); return cycles; //B = SLA(B);                                  break; //SLA B    2   8   Z00C
+            case 0x21: SLA(ref cycles, IncsType.R8, "C"); return cycles; //C = SLA(C);                                  break; //SLA C    2   8   Z00C
+            case 0x22: SLA(ref cycles, IncsType.R8, "D"); return cycles; //D = SLA(D);                                  break; //SLA D    2   8   Z00C
+            case 0x23: SLA(ref cycles, IncsType.R8, "E"); return cycles; //E = SLA(E);                                  break; //SLA E    2   8   Z00C
+            case 0x24: SLA(ref cycles, IncsType.R8, "H"); return cycles; //H = SLA(H);                                  break; //SLA H    2   8   Z00C
+            case 0x25: SLA(ref cycles, IncsType.R8, "L"); return cycles; //L = SLA(L);                                  break; //SLA L    2   8   Z00C
+            case 0x26: SLA(ref cycles, IncsType.MAddr); return cycles; //_mmu.Write(HL, SLA(_mmu.Read(HL)));    break; //SLA (HL) 2   8   Z00C
+            case 0x27: SLA(ref cycles, IncsType.R8, "A"); return cycles; //A = SLA(A);                                  break; //SLA B    2   8   Z00C
                                                                         
             case 0x28: B = SRA(B);                                  break; //SRA B    2   8   Z00C
             case 0x29: C = SRA(C);                                  break; //SRA C    2   8   Z00C
@@ -998,8 +998,56 @@ public class CPU
         FlagC = (b & 0x1) != 0;
         return result;
     }
+    private void SLA(ref int _cycles, IncsType incsType, string data1 = "")
+    {
+        if (incsType == IncsType.R8)
+        {
+            u8 value = 0;
+            switch (data1)
+            {
+                case "B": value = B; break;
+                case "C": value = C; break;
+                case "D": value = D; break;
+                case "E": value = E; break;
+                case "H": value = H; break;
+                case "L": value = L; break;
+                case "A": value = A; break;
+            }
 
-    private byte SLA(byte b) {//Z00C
+            u8 result = (u8) (value << 1);
+
+            SetFlagZ(result);
+            FlagN = false;
+            FlagH = false;
+            FlagC = (value & 0x80) != 0;
+
+            switch (data1)
+            {
+                case "B": B = result; break;
+                case "C": C = result; break;
+                case "D": D = result; break;
+                case "E": E = result; break;
+                case "H": H = result; break;
+                case "L": L = result; break;
+                case "A": A = result; break;
+            }
+
+            _cycles += 8;
+        }
+        else if (incsType == IncsType.MAddr)
+        {
+            u8 value = _mmu.Read(HL);
+            SetFlagZ((u8) (value << 1));
+            FlagN = false;
+            FlagH = false;
+            FlagC = (value & 0x80) != 0;
+            _mmu.Write(HL, (u8) (value << 1));
+
+            _cycles += 16;
+        }
+    }
+
+    private byte SLA2(byte b) {//Z00C
         byte result = (byte)(b << 1);
         SetFlagZ(result);
         FlagN = false;
