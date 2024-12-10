@@ -409,14 +409,14 @@ public class CPU
             case 0xDE: SBC(ref cycles, IncsType.R8_D8); return cycles;//SBC(_mmu.Read(PC)); PC += 1;  break; //SBC A,A8    2 8     Z1HC
             case 0xDF: RST(ref cycles,0x18); return cycles; //RST(0x18);                  break; //RST 3 18    1 16    ----
 
-            case 0xE0:  //LDH (A8),A 2 12 ----
-                ushort value1 = (ushort)(0xFF00 + _mmu.Read(PC));
-                byte value2 = A;
-                _mmu.Write((ushort)(0xFF00 + _mmu.Read(PC)), A); 
-                PC += 1;  
-                break;
+            case 0xE0:  LD(ref cycles,IncsType.A8_R8); return cycles;//LDH (A8),A 2 12 ----
+                // ushort value1 = (ushort)(0xFF00 + _mmu.Read(PC));
+                // byte value2 = A;
+                // _mmu.Write((ushort)(0xFF00 + _mmu.Read(PC)), A); 
+                // PC += 1;  
+                // break;
             case 0xE1: POP(ref cycles, "HL"); return cycles; //HL = POP();                   break; //POP HL      1 12    ----
-            case 0xE2: _mmu.Write((ushort)(0xFF00 + C), A);   break; //LD (C),A   1 8  ----
+            case 0xE2: LD(ref cycles,IncsType.MAddr8_R8); return cycles;//_mmu.Write((ushort)(0xFF00 + C), A);   break; //LD (C),A   1 8  ----
             //case 0xE3:                                break; //Illegal Opcode
             //case 0xE4:                                break; //Illegal Opcode
             case 0xE5: PUSH(ref cycles, "HL");return cycles;//PUSH(HL);                   break; //PUSH HL     1 16    ----
