@@ -726,77 +726,74 @@ public class CPU
             case 0x3E: SRL(ref cycles, IncsType.MAddr); return cycles; //_mmu.Write(HL, SRL(_mmu.Read(HL)));    break; //SRL (HL) 2   8   Z000
             case 0x3F: SRL(ref cycles, IncsType.R8, "A"); return cycles; //A = SRL(A);                                  break; //SRL B    2   8   Z000
 
-            case 0x40: BIT(0x1, B);                                 break; //BIT B    2   8   Z01-
-            case 0x41: BIT(0x1, C);                                 break; //BIT C    2   8   Z01-
-            case 0x42: BIT(0x1, D);                                 break; //BIT D    2   8   Z01-
-            case 0x43: BIT(0x1, E);                                 break; //BIT E    2   8   Z01-
-            case 0x44: BIT(0x1, H);                                 break; //BIT H    2   8   Z01-
-            case 0x45: BIT(0x1, L);                                 break; //BIT L    2   8   Z01-
-            case 0x46: BIT(0x1, _mmu.Read(HL));                  break; //BIT (HL) 2   8   Z01-
-            case 0x47: BIT(0x1, A);                                 break; //BIT B    2   8   Z01-
+            case 0x40: BIT(ref cycles, IncsType.R8, 0x01, "B"); return cycles; //BIT(0x1, B);                                 break; //BIT B    2   8   Z01-
+            case 0x41: BIT(ref cycles, IncsType.R8, 0x01, "C"); return cycles; //BIT(0x1, C);                                 break; //BIT C    2   8   Z01-
+            case 0x42: BIT(ref cycles, IncsType.R8, 0x01, "D"); return cycles; //BIT(0x1, D);                                 break; //BIT D    2   8   Z01-
+            case 0x43: BIT(ref cycles, IncsType.R8, 0x01, "E"); return cycles; //BIT(0x1, E);                                 break; //BIT E    2   8   Z01-
+            case 0x44: BIT(ref cycles, IncsType.R8, 0x01, "H"); return cycles; //BIT(0x1, H);                                 break; //BIT H    2   8   Z01-
+            case 0x45: BIT(ref cycles, IncsType.R8, 0x01, "L"); return cycles; //BIT(0x1, L);                                 break; //BIT L    2   8   Z01-
+            case 0x46: BIT(ref cycles, IncsType.MAddr, 0x01); return cycles; //BIT(0x1, _mmu.Read(HL));                  break; //BIT (HL) 2   8   Z01-
+            case 0x47: BIT(ref cycles, IncsType.R8, 0x01, "A"); return cycles; //BIT(0x1, A);                                 break; //BIT B    2   8   Z01-
 
-            case 0x48: BIT(0x2, B);                                break; //BIT B    2   8   Z01-
-            case 0x49: BIT(0x2, C);                                break; //BIT C    2   8   Z01-
-            case 0x4A: BIT(0x2, D);                                break; //BIT D    2   8   Z01-
-            case 0x4B: BIT(0x2, E);                                break; //BIT E    2   8   Z01-
-            case 0x4C: BIT(0x2, H);                                break; //BIT H    2   8   Z01-
-            case 0x4D: BIT(0x2, L);                                break; //BIT L    2   8   Z01-
-            case 0x4E: BIT(0x2, _mmu.Read(HL));                 break; //BIT (HL) 2   8   Z01-
-            case 0x4F: BIT(0x2, A);                                break; //BIT B    2   8   Z01-
+            case 0x48: BIT(ref cycles, IncsType.R8, 0x02, "B"); return cycles; //BIT(0x2, B);                                break; //BIT B    2   8   Z01-
+            case 0x49: BIT(ref cycles, IncsType.R8, 0x02, "C"); return cycles; //BIT(0x2, C);                                break; //BIT C    2   8   Z01-
+            case 0x4A: BIT(ref cycles, IncsType.R8, 0x02, "D"); return cycles; //BIT(0x2, D);                                break; //BIT D    2   8   Z01-
+            case 0x4B: BIT(ref cycles, IncsType.R8, 0x02, "E"); return cycles; //BIT(0x2, E);                                break; //BIT E    2   8   Z01-
+            case 0x4C: BIT(ref cycles, IncsType.R8, 0x02, "H"); return cycles; //BIT(0x2, H);                                break; //BIT H    2   8   Z01-
+            case 0x4D: BIT(ref cycles, IncsType.R8, 0x02, "L"); return cycles; //BIT(0x2, L);                                break; //BIT L    2   8   Z01-
+            case 0x4E: BIT(ref cycles, IncsType.MAddr, 0x02); return cycles; //BIT(0x2, _mmu.Read(HL));                 break; //BIT (HL) 2   8   Z01-
+            case 0x4F: BIT(ref cycles, IncsType.R8, 0x02, "A"); return cycles; //BIT(0x2, A);                                break; //BIT B    2   8   Z01-
                                                                     
-            case 0x50: BIT(0x4, B);                                break; //BIT B    2   8   Z01-
-            case 0x51: BIT(0x4, C);                                break; //BIT C    2   8   Z01-
-            case 0x52: BIT(0x4, D);                                break; //BIT D    2   8   Z01-
-            case 0x53: BIT(0x4, E);                                break; //BIT E    2   8   Z01-
-            case 0x54: BIT(0x4, H);                                break; //BIT H    2   8   Z01-
-            case 0x55: BIT(0x4, L);                                break; //BIT L    2   8   Z01-
-            case 0x56: BIT(0x4, _mmu.Read(HL));                 break; //BIT (HL) 2   8   Z01-
-            case 0x57: BIT(0x4, A);                                break; //BIT B    2   8   Z01-
+            case 0x50: BIT(ref cycles, IncsType.R8, 0x04, "B"); return cycles; //break;
+            case 0x51: BIT(ref cycles, IncsType.R8, 0x04, "C"); return cycles; //break;
+            case 0x52: BIT(ref cycles, IncsType.R8, 0x04, "D"); return cycles; //break;
+            case 0x53: BIT(ref cycles, IncsType.R8, 0x04, "E"); return cycles; //break;
+            case 0x54: BIT(ref cycles, IncsType.R8, 0x04, "H"); return cycles; //break;
+            case 0x55: BIT(ref cycles, IncsType.R8, 0x04, "L"); return cycles; //break;
+            case 0x56: BIT(ref cycles, IncsType.MAddr, 0x04); return cycles; //break;
+            case 0x57: BIT(ref cycles, IncsType.R8, 0x04, "A"); return cycles; //break;
+            case 0x58: BIT(ref cycles, IncsType.R8, 0x08, "B"); return cycles; //break;
+            case 0x59: BIT(ref cycles, IncsType.R8, 0x08, "C"); return cycles; //break;
+            case 0x5A: BIT(ref cycles, IncsType.R8, 0x08, "D"); return cycles; //break;
+            case 0x5B: BIT(ref cycles, IncsType.R8, 0x08, "E"); return cycles; //break;
+            case 0x5C: BIT(ref cycles, IncsType.R8, 0x08, "H"); return cycles; //break;
+            case 0x5D: BIT(ref cycles, IncsType.R8, 0x08, "L"); return cycles; //break;
+            case 0x5E: BIT(ref cycles, IncsType.MAddr, 0x08); return cycles; //break;
+            case 0x5F: BIT(ref cycles, IncsType.R8, 0x08, "A"); return cycles; //break;                             break; //BIT B    2   8   Z01-
 
-            case 0x58: BIT(0x8, B);                                break; //BIT B    2   8   Z01-
-            case 0x59: BIT(0x8, C);                                break; //BIT C    2   8   Z01-
-            case 0x5A: BIT(0x8, D);                                break; //BIT D    2   8   Z01-
-            case 0x5B: BIT(0x8, E);                                break; //BIT E    2   8   Z01-
-            case 0x5C: BIT(0x8, H);                                break; //BIT H    2   8   Z01-
-            case 0x5D: BIT(0x8, L);                                break; //BIT L    2   8   Z01-
-            case 0x5E: BIT(0x8, _mmu.Read(HL));                 break; //BIT (HL) 2   8   Z01-
-            case 0x5F: BIT(0x8, A);                                break; //BIT B    2   8   Z01-
+            case 0x60: BIT(ref cycles, IncsType.R8, 0x10, "B"); return cycles; //break;
+            case 0x61: BIT(ref cycles, IncsType.R8, 0x10, "C"); return cycles; //break;
+            case 0x62: BIT(ref cycles, IncsType.R8, 0x10, "D"); return cycles; //break;
+            case 0x63: BIT(ref cycles, IncsType.R8, 0x10, "E"); return cycles; //break;
+            case 0x64: BIT(ref cycles, IncsType.R8, 0x10, "H"); return cycles; //break;
+            case 0x65: BIT(ref cycles, IncsType.R8, 0x10, "L"); return cycles; //break;
+            case 0x66: BIT(ref cycles, IncsType.MAddr, 0x10); return cycles; //break;
+            case 0x67: BIT(ref cycles, IncsType.R8, 0x10, "A"); return cycles; //break;
+            case 0x68: BIT(ref cycles, IncsType.R8, 0x20, "B"); return cycles; //break;
+            case 0x69: BIT(ref cycles, IncsType.R8, 0x20, "C"); return cycles; //break;
+            case 0x6A: BIT(ref cycles, IncsType.R8, 0x20, "D"); return cycles; //break;
+            case 0x6B: BIT(ref cycles, IncsType.R8, 0x20, "E"); return cycles; //break;
+            case 0x6C: BIT(ref cycles, IncsType.R8, 0x20, "H"); return cycles; //break;
+            case 0x6D: BIT(ref cycles, IncsType.R8, 0x20, "L"); return cycles; //break;
+            case 0x6E: BIT(ref cycles, IncsType.MAddr, 0x20); return cycles; //break;
+            case 0x6F: BIT(ref cycles, IncsType.R8, 0x20, "A"); return cycles; //break;                           break; //BIT B    2   8   Z01-
 
-            case 0x60: BIT(0x10, B);                               break; //BIT B    2   8   Z01-
-            case 0x61: BIT(0x10, C);                               break; //BIT C    2   8   Z01-
-            case 0x62: BIT(0x10, D);                               break; //BIT D    2   8   Z01-
-            case 0x63: BIT(0x10, E);                               break; //BIT E    2   8   Z01-
-            case 0x64: BIT(0x10, H);                               break; //BIT H    2   8   Z01-
-            case 0x65: BIT(0x10, L);                               break; //BIT L    2   8   Z01-
-            case 0x66: BIT(0x10, _mmu.Read(HL));                break; //BIT (HL) 2   8   Z01-
-            case 0x67: BIT(0x10, A);                               break; //BIT B    2   8   Z01-
-
-            case 0x68: BIT(0x20, B);                               break; //BIT B    2   8   Z01-
-            case 0x69: BIT(0x20, C);                               break; //BIT C    2   8   Z01-
-            case 0x6A: BIT(0x20, D);                               break; //BIT D    2   8   Z01-
-            case 0x6B: BIT(0x20, E);                               break; //BIT E    2   8   Z01-
-            case 0x6C: BIT(0x20, H);                               break; //BIT H    2   8   Z01-
-            case 0x6D: BIT(0x20, L);                               break; //BIT L    2   8   Z01-
-            case 0x6E: BIT(0x20, _mmu.Read(HL));                break; //BIT (HL) 2   8   Z01-
-            case 0x6F: BIT(0x20, A);                               break; //BIT B    2   8   Z01-
-
-            case 0x70: BIT(0x40, B);                               break; //BIT B    2   8   Z01-
-            case 0x71: BIT(0x40, C);                               break; //BIT C    2   8   Z01-
-            case 0x72: BIT(0x40, D);                               break; //BIT D    2   8   Z01-
-            case 0x73: BIT(0x40, E);                               break; //BIT E    2   8   Z01-
-            case 0x74: BIT(0x40, H);                               break; //BIT H    2   8   Z01-
-            case 0x75: BIT(0x40, L);                               break; //BIT L    2   8   Z01-
-            case 0x76: BIT(0x40, _mmu.Read(HL));                break; //BIT (HL) 2   8   Z01-
-            case 0x77: BIT(0x40, A);                               break; //BIT B    2   8   Z01-
-
-            case 0x78: BIT(0x80, B);                               break; //BIT B    2   8   Z01-
-            case 0x79: BIT(0x80, C);                               break; //BIT C    2   8   Z01-
-            case 0x7A: BIT(0x80, D);                               break; //BIT D    2   8   Z01-
-            case 0x7B: BIT(0x80, E);                               break; //BIT E    2   8   Z01-
-            case 0x7C: BIT(0x80, H);                               break; //BIT H    2   8   Z01-
-            case 0x7D: BIT(0x80, L);                               break; //BIT L    2   8   Z01-
-            case 0x7E: BIT(0x80, _mmu.Read(HL));                break; //BIT (HL) 2   8   Z01-
-            case 0x7F: BIT(0x80, A);                               break; //BIT B    2   8   Z01-
+            case 0x70: BIT(ref cycles, IncsType.R8, 0x40, "B"); return cycles; //break;
+            case 0x71: BIT(ref cycles, IncsType.R8, 0x40, "C"); return cycles; //break;
+            case 0x72: BIT(ref cycles, IncsType.R8, 0x40, "D"); return cycles; //break;
+            case 0x73: BIT(ref cycles, IncsType.R8, 0x40, "E"); return cycles; //break;
+            case 0x74: BIT(ref cycles, IncsType.R8, 0x40, "H"); return cycles; //break;
+            case 0x75: BIT(ref cycles, IncsType.R8, 0x40, "L"); return cycles; //break;
+            case 0x76: BIT(ref cycles, IncsType.MAddr, 0x40); return cycles; //break;
+            case 0x77: BIT(ref cycles, IncsType.R8, 0x40, "A"); return cycles; //break;
+            case 0x78: BIT(ref cycles, IncsType.R8, 0x80, "B"); return cycles; //break;
+            case 0x79: BIT(ref cycles, IncsType.R8, 0x80, "C"); return cycles; //break;
+            case 0x7A: BIT(ref cycles, IncsType.R8, 0x80, "D"); return cycles; //break;
+            case 0x7B: BIT(ref cycles, IncsType.R8, 0x80, "E"); return cycles; //break;
+            case 0x7C: BIT(ref cycles, IncsType.R8, 0x80, "H"); return cycles; //break;
+            case 0x7D: BIT(ref cycles, IncsType.R8, 0x80, "L"); return cycles; //break;
+            case 0x7E: BIT(ref cycles, IncsType.MAddr, 0x80); return cycles; //break;
+            case 0x7F: BIT(ref cycles, IncsType.R8, 0x80, "A"); return cycles; //break;
 
             case 0x80: B = RES(0x1, B);                               break; //RES B    2   8   ----
             case 0x81: C = RES(0x1, C);                               break; //RES C    2   8   ----
@@ -955,8 +952,40 @@ public class CPU
     private byte RES(int b, byte reg) {//----
         return (byte)(reg & ~b);
     }
+    private void BIT(ref int _cycles, IncsType incsType, u8 bit, string data1 = "")
+    {
+        if (incsType == IncsType.R8)
+        {
+            u8 value = 0;
+            switch (data1)
+            {
+                case "B": value = B; break;
+                case "C": value = C; break;
+                case "D": value = D; break;
+                case "E": value = E; break;
+                case "H": value = H; break;
+                case "L": value = L; break;
+                case "A": value = A; break;
+            }
 
-    private void BIT(byte b, byte reg) {//Z01-
+            FlagZ = (value & bit) == 0;
+            FlagN = false;
+            FlagH = true;
+
+            _cycles += 8;
+        }
+        else if (incsType == IncsType.MAddr)
+        {
+            u8 value = _mmu.Read(HL);
+            FlagZ = (value & bit) == 0;
+            FlagN = false;
+            FlagH = true;
+
+            _cycles += 12;
+        }
+    }
+
+    private void BIT2(byte b, byte reg) {//Z01-
         FlagZ = (reg & b) == 0;
         FlagN = false;
         FlagH = true;
