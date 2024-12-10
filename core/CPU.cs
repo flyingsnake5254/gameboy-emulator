@@ -373,7 +373,7 @@ public class CPU
             case 0xBE: CP(ref cycles, IncsType.MAddr); return cycles;// CP(_mmu.Read(HL));  break; //CP M     	1 8    Z1HC
             case 0xBF: CP(ref cycles, IncsType.R8, "B"); return cycles; //CP(A);                 break; //CP A     	1 4    Z1HC
 
-            case 0xC0: RETURN(!FlagZ);             break; //RET NZ	     1 20/8  ----
+            case 0xC0: RET(ref cycles, !FlagZ); return cycles; //RETURN(!FlagZ);             break; //RET NZ	     1 20/8  ----
             case 0xC1: BC = POP();                   break; //POP BC      1 12    ----
             case 0xC2: JUMP(!FlagZ);               break; //JP NZ,A16   3 16/12 ----
             case 0xC3: JUMP(true);                 break; //JP A16      3 16    ----
