@@ -434,14 +434,14 @@ public class CPU
 
             case 0xF0: LD(ref cycles,IncsType.R8_A8);return cycles; //A = _mmu.Read((ushort)(0xFF00 + _mmu.Read(PC))); PC += 1;  break; //LDH A,(A8)  2 12    ----
             case 0xF1: POP(ref cycles, "AF"); return cycles; //AF = POP();                   break; //POP AF      1 12    ZNHC
-            case 0xF2: A = _mmu.Read((ushort)(0xFF00 + C));  break; //LD A,(C)    1 8     ----
-            case 0xF3: IME = false;                     break; //DI          1 4     ----
+            case 0xF2: LD(ref cycles, IncsType.R8_MAddr8);return cycles; //A = _mmu.Read((ushort)(0xFF00 + C));  break; //LD A,(C)    1 8     ----
+            case 0xF3: DI(ref cycles); return cycles;//IME = false;                     break; //DI          1 4     ----
             //case 0xF4:                                break; //Illegal Opcode
             case 0xF5: PUSH(ref cycles, "AF");return cycles;//PUSH(AF);                   break; //PUSH AF     1 16    ----
             case 0xF6: OR(ref cycles, IncsType.D8); return cycles; //OR(_mmu.Read(PC)); PC += 1;   break; //OR D8       2 8     Z000
             case 0xF7: RST(ref cycles,0x30); return cycles; //RST(0x30);                  break; //RST 6 30    1 16    ----
 
-            case 0xF8: HL = DADr8(SP);             break; //LD HL,SP+R8 2 12    00HC
+            case 0xF8: LD(ref cycles, IncsType.R16_R16S8); return cycles; //HL = DADr8(SP);             break; //LD HL,SP+R8 2 12    00HC
             case 0xF9: SP = HL;                         break; //LD SP,HL    1 8     ----
             case 0xFA: A = _mmu.Read(_mmu.ReadROM16(PC)); PC += 2;   break; //LD A,(A16)  3 16    ----
             case 0xFB: IMEEnabler = true;               break; //IE          1 4     ----
@@ -959,6 +959,11 @@ public class CPU
         FlagZ = (reg & b) == 0;
         FlagN = false;
         FlagH = true;
+    }
+    private void DI(ref int _cycles)
+    {
+        IME = false;
+        _cycles += 4;
     }
 
     private byte SRL(byte b) {//Z00C
