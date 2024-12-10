@@ -717,14 +717,14 @@ public class CPU
             case 0x36: SWAP(ref cycles, IncsType.MAddr); return cycles; //_mmu.Write(HL, SWAP(_mmu.Read(HL)));   break; //SWAP (HL) 2   8   Z00C
             case 0x37: SWAP(ref cycles, IncsType.R8, "A"); return cycles; //A = SWAP(A);                                 break; //SWAP B    2   8   Z00C
                                                                         
-            case 0x38: B = SRL(B);                                  break; //SRL B    2   8   Z000
-            case 0x39: C = SRL(C);                                  break; //SRL C    2   8   Z000
-            case 0x3A: D = SRL(D);                                  break; //SRL D    2   8   Z000
-            case 0x3B: E = SRL(E);                                  break; //SRL E    2   8   Z000
-            case 0x3C: H = SRL(H);                                  break; //SRL H    2   8   Z000
-            case 0x3D: L = SRL(L);                                  break; //SRL L    2   8   Z000
-            case 0x3E: _mmu.Write(HL, SRL(_mmu.Read(HL)));    break; //SRL (HL) 2   8   Z000
-            case 0x3F: A = SRL(A);                                  break; //SRL B    2   8   Z000
+            case 0x38: SRL(ref cycles, IncsType.R8, "B"); return cycles; //B = SRL(B);                                  break; //SRL B    2   8   Z000
+            case 0x39: SRL(ref cycles, IncsType.R8, "C"); return cycles; //C = SRL(C);                                  break; //SRL C    2   8   Z000
+            case 0x3A: SRL(ref cycles, IncsType.R8, "D"); return cycles; //D = SRL(D);                                  break; //SRL D    2   8   Z000
+            case 0x3B: SRL(ref cycles, IncsType.R8, "E"); return cycles; //E = SRL(E);                                  break; //SRL E    2   8   Z000
+            case 0x3C: SRL(ref cycles, IncsType.R8, "H"); return cycles; //H = SRL(H);                                  break; //SRL H    2   8   Z000
+            case 0x3D: SRL(ref cycles, IncsType.R8, "L"); return cycles; //L = SRL(L);                                  break; //SRL L    2   8   Z000
+            case 0x3E: SRL(ref cycles, IncsType.MAddr); return cycles; //_mmu.Write(HL, SRL(_mmu.Read(HL)));    break; //SRL (HL) 2   8   Z000
+            case 0x3F: SRL(ref cycles, IncsType.R8, "A"); return cycles; //A = SRL(A);                                  break; //SRL B    2   8   Z000
 
             case 0x40: BIT(0x1, B);                                 break; //BIT B    2   8   Z01-
             case 0x41: BIT(0x1, C);                                 break; //BIT C    2   8   Z01-
@@ -979,6 +979,55 @@ public class CPU
         FlagH = false;
         FlagC = (b & 0x1) != 0;
         return result;
+    }
+    private void SRL(ref int _cycles, IncsType incsType, string data1 = "")
+    {
+        if (incsType == IncsType.R8)
+        {
+            u8 value = 0;
+            switch (data1)
+            {
+                case "B": value = B; break;
+                case "C": value = C; break;
+                case "D": value = D; break;
+                case "E": value = E; break;
+                case "H": value = H; break;
+                case "L": value = L; break;
+                case "A": value = A; break;
+            }
+
+            u8 result = (u8) (value >> 1);
+
+            SetFlagZ(result);
+            FlagN = false;
+            FlagH = false;
+            FlagC = (value & 0x01) != 0;
+
+            switch (data1)
+            {
+                case "B": B = result; break;
+                case "C": C = result; break;
+                case "D": D = result; break;
+                case "E": E = result; break;
+                case "H": H = result; break;
+                case "L": L = result; break;
+                case "A": A = result; break;
+            }
+
+            _cycles += 8;
+        }
+        else if (incsType == IncsType.MAddr)
+        {
+            u8 value = _mmu.Read(HL);
+            u8 result = (u8) (value >> 1);
+            SetFlagZ(result);
+            FlagN = false;
+            FlagH = false;
+            FlagC = (value & 0x01) != 0;
+            _mmu.Write(HL, result);
+
+            _cycles += 16;
+        }
     }
 
 private void SWAP(ref int _cycles, IncsType incsType, string data1 = "")
