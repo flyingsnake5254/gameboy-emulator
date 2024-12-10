@@ -374,7 +374,7 @@ public class CPU
             case 0xBF: CP(ref cycles, IncsType.R8, "B"); return cycles; //CP(A);                 break; //CP A     	1 4    Z1HC
 
             case 0xC0: RET(ref cycles, !FlagZ); return cycles; //RETURN(!FlagZ);             break; //RET NZ	     1 20/8  ----
-            case 0xC1: BC = POP();                   break; //POP BC      1 12    ----
+            case 0xC1: POP(ref cycles, "BC"); return cycles; //BC = POP();                   break; //POP BC      1 12    ----
             case 0xC2: JUMP(!FlagZ);               break; //JP NZ,A16   3 16/12 ----
             case 0xC3: JUMP(true);                 break; //JP A16      3 16    ----
             case 0xC4: CALL(!FlagZ);               break; //CALL NZ A16 3 24/12 ----
@@ -392,7 +392,7 @@ public class CPU
             case 0xCF: RST(0x8);                   break; //RST 1 08    1 16    ----
 
             case 0xD0: RET(ref cycles, !FlagC); return cycles;//RETURN(!FlagC);             break; //RET NC      1 20/8  ----
-            case 0xD1: DE = POP();                   break; //POP DE      1 12    ----
+            case 0xD1: POP(ref cycles, "DE"); return cycles; //DE = POP();                   break; //POP DE      1 12    ----
             case 0xD2: JUMP(!FlagC);               break; //JP NC,A16   3 16/12 ----
             //case 0xD3:                                break; //Illegal Opcode
             case 0xD4: CALL(!FlagC);               break; //CALL NC,A16 3 24/12 ----
@@ -415,7 +415,7 @@ public class CPU
                 _mmu.Write((ushort)(0xFF00 + _mmu.Read(PC)), A); 
                 PC += 1;  
                 break;
-            case 0xE1: HL = POP();                   break; //POP HL      1 12    ----
+            case 0xE1: POP(ref cycles, "HL"); return cycles; //HL = POP();                   break; //POP HL      1 12    ----
             case 0xE2: _mmu.Write((ushort)(0xFF00 + C), A);   break; //LD (C),A   1 8  ----
             //case 0xE3:                                break; //Illegal Opcode
             //case 0xE4:                                break; //Illegal Opcode
@@ -433,7 +433,7 @@ public class CPU
             case 0xEF: RST(0x28);                  break; //RST 5 28    1 16    ----
 
             case 0xF0: A = _mmu.Read((ushort)(0xFF00 + _mmu.Read(PC))); PC += 1;  break; //LDH A,(A8)  2 12    ----
-            case 0xF1: AF = POP();                   break; //POP AF      1 12    ZNHC
+            case 0xF1: POP(ref cycles, "AF"); return cycles; //AF = POP();                   break; //POP AF      1 12    ZNHC
             case 0xF2: A = _mmu.Read((ushort)(0xFF00 + C));  break; //LD A,(C)    1 8     ----
             case 0xF3: IME = false;                     break; //DI          1 4     ----
             //case 0xF4:                                break; //Illegal Opcode
@@ -1553,13 +1553,13 @@ private void OR(ref int _cycles, IncsType incsType, string data1 = "")
     }
     private void RET(ref int _cycles, bool flag)
     {
-        if (flag) { PC = POP(); }
+        if (flag) { PC = POP2(); }
         _cycles += 8;
     }
 
     private void RETI(ref int _cycles)
     {
-        PC = POP();
+        PC = POP2();
         _cycles -= 12; // POP Cycle
         _cycles += 16;
         IME = true;
@@ -1567,7 +1567,7 @@ private void OR(ref int _cycles, IncsType incsType, string data1 = "")
 
     private void RETURN(bool flag) {
         if (flag) {
-            PC = POP();
+            PC = POP2();
             cycles += 20;
         } else {
             cycles += 8;
@@ -1648,7 +1648,7 @@ private void OR(ref int _cycles, IncsType incsType, string data1 = "")
         _mmu.WriteROM16(SP, w);
     }
 
-    private ushort POP() {
+    private ushort POP2() {
         ushort ret = _mmu.ReadROM16(SP);
         SP += 2;
         //byte l = _mmu.Read(++SP);
@@ -1658,6 +1658,21 @@ private void OR(ref int _cycles, IncsType incsType, string data1 = "")
 
 
         return ret;
+    }
+    private u16 POP(ref int _cycles, string data1 = "")
+    {
+        u16 value = _mmu.ReadROM16(SP);
+        SP += 2;
+
+        switch (data1)
+        {
+            case "BC": BC = value; break;
+            case "DE": DE = value; break;
+            case "HL": HL = value; break;
+            case "AF": AF = value; break;
+        }
+        _cycles += 12;
+        return value;
     }
 
     private void SetFlagZ(int b) {
