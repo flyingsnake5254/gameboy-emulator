@@ -9,7 +9,7 @@ public class Emulator
     private Timer _timer;
     private Cartridge _cartridge;
     private Keyboard _keyboard;
-    private bool _running = false;
+    public bool _running = false;
 
     public Emulator(string filePath, DrawingArea drawingArea, Keyboard keyboard)
     {
@@ -34,7 +34,9 @@ public class Emulator
         {
             while (cycles < 70224) // 一幀需要的時鐘週期數
             {
+                // returnCycles = _cpu.Step2();
                 returnCycles = _cpu.Step();
+                // if (returnCycles == -100) _running = false;
                 cycles += returnCycles;
 
                 // 更新 Timer
