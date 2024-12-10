@@ -795,77 +795,73 @@ public class CPU
             case 0x7E: BIT(ref cycles, IncsType.MAddr, 0x80); return cycles; //break;
             case 0x7F: BIT(ref cycles, IncsType.R8, 0x80, "A"); return cycles; //break;
 
-            case 0x80: B = RES(0x1, B);                               break; //RES B    2   8   ----
-            case 0x81: C = RES(0x1, C);                               break; //RES C    2   8   ----
-            case 0x82: D = RES(0x1, D);                               break; //RES D    2   8   ----
-            case 0x83: E = RES(0x1, E);                               break; //RES E    2   8   ----
-            case 0x84: H = RES(0x1, H);                               break; //RES H    2   8   ----
-            case 0x85: L = RES(0x1, L);                               break; //RES L    2   8   ----
-            case 0x86: _mmu.Write(HL, RES(0x1, _mmu.Read(HL))); break; //RES (HL) 2   8   ----
-            case 0x87: A = RES(0x1, A);                               break; //RES B    2   8   ----
+            case 0x80: RES(ref cycles, IncsType.R8, 0x01, "B"); return cycles; //break;
+            case 0x81: RES(ref cycles, IncsType.R8, 0x01, "C"); return cycles; //break;
+            case 0x82: RES(ref cycles, IncsType.R8, 0x01, "D"); return cycles; //break;
+            case 0x83: RES(ref cycles, IncsType.R8, 0x01, "E"); return cycles; //break;
+            case 0x84: RES(ref cycles, IncsType.R8, 0x01, "H"); return cycles; //break;
+            case 0x85: RES(ref cycles, IncsType.R8, 0x01, "L"); return cycles; //break;
+            case 0x86: RES(ref cycles, IncsType.MAddr, 0x01); return cycles; //break;
+            case 0x87: RES(ref cycles, IncsType.R8, 0x01, "A"); return cycles; //break;
+            case 0x88: RES(ref cycles, IncsType.R8, 0x02, "B"); return cycles; //break;
+            case 0x89: RES(ref cycles, IncsType.R8, 0x02, "C"); return cycles; //break;
+            case 0x8A: RES(ref cycles, IncsType.R8, 0x02, "D"); return cycles; //break;
+            case 0x8B: RES(ref cycles, IncsType.R8, 0x02, "E"); return cycles; //break;
+            case 0x8C: RES(ref cycles, IncsType.R8, 0x02, "H"); return cycles; //break;
+            case 0x8D: RES(ref cycles, IncsType.R8, 0x02, "L"); return cycles; //break;
+            case 0x8E: RES(ref cycles, IncsType.MAddr, 0x02); return cycles; //break;
+            case 0x8F: RES(ref cycles, IncsType.R8, 0x02, "A"); return cycles; //break;
 
-            case 0x88: B = RES(0x2, B);                               break; //RES B    2   8   ----
-            case 0x89: C = RES(0x2, C);                               break; //RES C    2   8   ----
-            case 0x8A: D = RES(0x2, D);                               break; //RES D    2   8   ----
-            case 0x8B: E = RES(0x2, E);                               break; //RES E    2   8   ----
-            case 0x8C: H = RES(0x2, H);                               break; //RES H    2   8   ----
-            case 0x8D: L = RES(0x2, L);                               break; //RES L    2   8   ----
-            case 0x8E: _mmu.Write(HL, RES(0x2, _mmu.Read(HL))); break; //RES (HL) 2   8   ----
-            case 0x8F: A = RES(0x2, A);                               break; //RES B    2   8   ----
+            case 0x90: RES(ref cycles, IncsType.R8, 0x04, "B"); return cycles; //break;
+            case 0x91: RES(ref cycles, IncsType.R8, 0x04, "C"); return cycles; //break;
+            case 0x92: RES(ref cycles, IncsType.R8, 0x04, "D"); return cycles; //break;
+            case 0x93: RES(ref cycles, IncsType.R8, 0x04, "E"); return cycles; //break;
+            case 0x94: RES(ref cycles, IncsType.R8, 0x04, "H"); return cycles; //break;
+            case 0x95: RES(ref cycles, IncsType.R8, 0x04, "L"); return cycles; //break;
+            case 0x96: RES(ref cycles, IncsType.MAddr, 0x04); return cycles; //break;
+            case 0x97: RES(ref cycles, IncsType.R8, 0x04, "A"); return cycles; //break;
+            case 0x98: RES(ref cycles, IncsType.R8, 0x08, "B"); return cycles; //break;
+            case 0x99: RES(ref cycles, IncsType.R8, 0x08, "C"); return cycles; //break;
+            case 0x9A: RES(ref cycles, IncsType.R8, 0x08, "D"); return cycles; //break;
+            case 0x9B: RES(ref cycles, IncsType.R8, 0x08, "E"); return cycles; //break;
+            case 0x9C: RES(ref cycles, IncsType.R8, 0x08, "H"); return cycles; //break;
+            case 0x9D: RES(ref cycles, IncsType.R8, 0x08, "L"); return cycles; //break;
+            case 0x9E: RES(ref cycles, IncsType.MAddr, 0x08); return cycles; //break;
+            case 0x9F: RES(ref cycles, IncsType.R8, 0x08, "A"); return cycles; //break;
 
-            case 0x90: B = RES(0x4, B);                               break; //RES B    2   8   ----
-            case 0x91: C = RES(0x4, C);                               break; //RES C    2   8   ----
-            case 0x92: D = RES(0x4, D);                               break; //RES D    2   8   ----
-            case 0x93: E = RES(0x4, E);                               break; //RES E    2   8   ----
-            case 0x94: H = RES(0x4, H);                               break; //RES H    2   8   ----
-            case 0x95: L = RES(0x4, L);                               break; //RES L    2   8   ----
-            case 0x96: _mmu.Write(HL, RES(0x4, _mmu.Read(HL))); break; //RES (HL) 2   8   ----
-            case 0x97: A = RES(0x4, A);                               break; //RES B    2   8   ----
+            case 0xA0: RES(ref cycles, IncsType.R8, 0x10, "B"); return cycles; //break;
+            case 0xA1: RES(ref cycles, IncsType.R8, 0x10, "C"); return cycles; //break;
+            case 0xA2: RES(ref cycles, IncsType.R8, 0x10, "D"); return cycles; //break;
+            case 0xA3: RES(ref cycles, IncsType.R8, 0x10, "E"); return cycles; //break;
+            case 0xA4: RES(ref cycles, IncsType.R8, 0x10, "H"); return cycles; //break;
+            case 0xA5: RES(ref cycles, IncsType.R8, 0x10, "L"); return cycles; //break;
+            case 0xA6: RES(ref cycles, IncsType.MAddr, 0x10); return cycles; //break;
+            case 0xA7: RES(ref cycles, IncsType.R8, 0x10, "A"); return cycles; //break;
+            case 0xA8: RES(ref cycles, IncsType.R8, 0x20, "B"); return cycles; //break;
+            case 0xA9: RES(ref cycles, IncsType.R8, 0x20, "C"); return cycles; //break;
+            case 0xAA: RES(ref cycles, IncsType.R8, 0x20, "D"); return cycles; //break;
+            case 0xAB: RES(ref cycles, IncsType.R8, 0x20, "E"); return cycles; //break;
+            case 0xAC: RES(ref cycles, IncsType.R8, 0x20, "H"); return cycles; //break;
+            case 0xAD: RES(ref cycles, IncsType.R8, 0x20, "L"); return cycles; //break;
+            case 0xAE: RES(ref cycles, IncsType.MAddr, 0x20); return cycles; //break;
+            case 0xAF: RES(ref cycles, IncsType.R8, 0x20, "A"); return cycles; //break;
 
-            case 0x98: B = RES(0x8, B);                               break; //RES B    2   8   ----
-            case 0x99: C = RES(0x8, C);                               break; //RES C    2   8   ----
-            case 0x9A: D = RES(0x8, D);                               break; //RES D    2   8   ----
-            case 0x9B: E = RES(0x8, E);                               break; //RES E    2   8   ----
-            case 0x9C: H = RES(0x8, H);                               break; //RES H    2   8   ----
-            case 0x9D: L = RES(0x8, L);                               break; //RES L    2   8   ----
-            case 0x9E: _mmu.Write(HL, RES(0x8, _mmu.Read(HL))); break; //RES (HL) 2   8   ----
-            case 0x9F: A = RES(0x8, A);                               break; //RES B    2   8   ----
-
-            case 0xA0: B = RES(0x10, B);                               break; //RES B    2   8   ----
-            case 0xA1: C = RES(0x10, C);                               break; //RES C    2   8   ----
-            case 0xA2: D = RES(0x10, D);                               break; //RES D    2   8   ----
-            case 0xA3: E = RES(0x10, E);                               break; //RES E    2   8   ----
-            case 0xA4: H = RES(0x10, H);                               break; //RES H    2   8   ----
-            case 0xA5: L = RES(0x10, L);                               break; //RES L    2   8   ----
-            case 0xA6: _mmu.Write(HL, RES(0x10, _mmu.Read(HL))); break; //RES (HL) 2   8   ----
-            case 0xA7: A = RES(0x10, A);                               break; //RES B    2   8   ----
-
-            case 0xA8: B = RES(0x20, B);                               break; //RES B    2   8   ----
-            case 0xA9: C = RES(0x20, C);                               break; //RES C    2   8   ----
-            case 0xAA: D = RES(0x20, D);                               break; //RES D    2   8   ----
-            case 0xAB: E = RES(0x20, E);                               break; //RES E    2   8   ----
-            case 0xAC: H = RES(0x20, H);                               break; //RES H    2   8   ----
-            case 0xAD: L = RES(0x20, L);                               break; //RES L    2   8   ----
-            case 0xAE: _mmu.Write(HL, RES(0x20, _mmu.Read(HL))); break; //RES (HL) 2   8   ----
-            case 0xAF: A = RES(0x20, A);                               break; //RES B    2   8   ----
-
-            case 0xB0: B = RES(0x40, B);                               break; //RES B    2   8   ----
-            case 0xB1: C = RES(0x40, C);                               break; //RES C    2   8   ----
-            case 0xB2: D = RES(0x40, D);                               break; //RES D    2   8   ----
-            case 0xB3: E = RES(0x40, E);                               break; //RES E    2   8   ----
-            case 0xB4: H = RES(0x40, H);                               break; //RES H    2   8   ----
-            case 0xB5: L = RES(0x40, L);                               break; //RES L    2   8   ----
-            case 0xB6: _mmu.Write(HL, RES(0x40, _mmu.Read(HL))); break; //RES (HL) 2   8   ----
-            case 0xB7: A = RES(0x40, A);                               break; //RES B    2   8   ----
-
-            case 0xB8: B = RES(0x80, B);                               break; //RES B    2   8   ----
-            case 0xB9: C = RES(0x80, C);                               break; //RES C    2   8   ----
-            case 0xBA: D = RES(0x80, D);                               break; //RES D    2   8   ----
-            case 0xBB: E = RES(0x80, E);                               break; //RES E    2   8   ----
-            case 0xBC: H = RES(0x80, H);                               break; //RES H    2   8   ----
-            case 0xBD: L = RES(0x80, L);                               break; //RES L    2   8   ----
-            case 0xBE: _mmu.Write(HL, RES(0x80, _mmu.Read(HL))); break; //RES (HL) 2   8   ----
-            case 0xBF: A = RES(0x80, A);                               break; //RES B    2   8   ----
+            case 0xB0: RES(ref cycles, IncsType.R8, 0x40, "B"); return cycles; //break;
+            case 0xB1: RES(ref cycles, IncsType.R8, 0x40, "C"); return cycles; //break;
+            case 0xB2: RES(ref cycles, IncsType.R8, 0x40, "D"); return cycles; //break;
+            case 0xB3: RES(ref cycles, IncsType.R8, 0x40, "E"); return cycles; //break;
+            case 0xB4: RES(ref cycles, IncsType.R8, 0x40, "H"); return cycles; //break;
+            case 0xB5: RES(ref cycles, IncsType.R8, 0x40, "L"); return cycles; //break;
+            case 0xB6: RES(ref cycles, IncsType.MAddr, 0x40); return cycles; //break;
+            case 0xB7: RES(ref cycles, IncsType.R8, 0x40, "A"); return cycles; //break;
+            case 0xB8: RES(ref cycles, IncsType.R8, 0x80, "B"); return cycles; //break;
+            case 0xB9: RES(ref cycles, IncsType.R8, 0x80, "C"); return cycles; //break;
+            case 0xBA: RES(ref cycles, IncsType.R8, 0x80, "D"); return cycles; //break;
+            case 0xBB: RES(ref cycles, IncsType.R8, 0x80, "E"); return cycles; //break;
+            case 0xBC: RES(ref cycles, IncsType.R8, 0x80, "H"); return cycles; //break;
+            case 0xBD: RES(ref cycles, IncsType.R8, 0x80, "L"); return cycles; //break;
+            case 0xBE: RES(ref cycles, IncsType.MAddr, 0x80); return cycles; //break;
+            case 0xBF: RES(ref cycles, IncsType.R8, 0x80, "A"); return cycles; //break;
 
             case 0xC0: B = SET(0x1, B);                               break; //SET B    2   8   ----
             case 0xC1: C = SET(0x1, C);                               break; //SET C    2   8   ----
@@ -948,8 +944,31 @@ public class CPU
     private byte SET(byte b, byte reg) {//----
         return (byte)(reg | b);
     }
+    private void RES(ref int _cycles, IncsType incsType, u8 bit, string data1 = "")
+    {
+        if (incsType == IncsType.R8)
+        {
+            switch (data1)
+            {
+                case "B": B = (u8) (B & ~bit); break;
+                case "C": C = (u8) (C & ~bit); break;
+                case "D": D = (u8) (D & ~bit); break;
+                case "E": E = (u8) (E & ~bit); break;
+                case "H": H = (u8) (H & ~bit); break;
+                case "L": L = (u8) (L & ~bit); break;
+                case "A": A = (u8) (A & ~bit); break;
+            }
 
-    private byte RES(int b, byte reg) {//----
+            _cycles += 8;
+        }
+        else if (incsType == IncsType.MAddr)
+        {
+            _mmu.Write(HL, (u8) (_mmu.Read(HL) & ~bit));
+            _cycles += 16;
+        }
+    }
+
+    private byte RES2(int b, byte reg) {//----
         return (byte)(reg & ~b);
     }
     private void BIT(ref int _cycles, IncsType incsType, u8 bit, string data1 = "")
