@@ -62,7 +62,7 @@ public class Registers
         }
     }
 
-    public void SetFlagZ(int value) { SetFlag(Flag.Z, value == 0); }
+    public void SetFlagZ(int value) { SetFlag(Flag.Z, ((u8) value) == 0); }
 
     public void SetFlagH(u8 value1, u8 value2, FlagH type = FlagH.U8) 
     { 

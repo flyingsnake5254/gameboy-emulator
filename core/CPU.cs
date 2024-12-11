@@ -1,7 +1,7 @@
 public class CPU
 {
     // 暫存器
-    public Registers Regs;
+    private Registers _regs;
 
     // 指令集
     private Instructions _insc;
@@ -9,21 +9,18 @@ public class CPU
     // Memory
     private MMU _mmu;
 
-    private long tick = 0;
-
 
     public CPU(ref MMU mmu)
     {
         this._mmu = mmu;
-        Regs = new Registers();
-        Regs.Init();
-        _insc = new Instructions(ref _mmu);
+        _regs = new Registers();
+        _regs.Init();
+        _insc = new Instructions(ref _mmu, ref _regs);
     }
 
     public int Step()
     {
-        int temp = _insc.Step();
-        return temp;
+        return _insc.Step();
     }
 
     public void Interrupt(int value)
