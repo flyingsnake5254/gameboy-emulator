@@ -130,14 +130,12 @@ public class Instructions
             case 0x36: LD(IncsType.MAddr_D8); break;
             case 0x37: SCF(); break;
             case 0x38: JR(FlagC); break;
-            case 0x39: ADD(IncsType.R16_R16, "SP");                                       break; //ADD HL,SP  1 8     -0HC
+            case 0x39: ADD(IncsType.R16_R16, "SP"); break;
             case 0x3A: LD(IncsType.R8_MAddr, "A", "HL-"); break;
             case 0x3B: DEC(IncsType.R16, "SP"); break;
             case 0x3C: INC(IncsType.R8, "A"); break;
             case 0x3D: DEC(IncsType.R8, "A"); break;
             case 0x3E: LD(IncsType.R8_D8, "A"); break;
-                // A = _mmu.Read(PC); PC += 1;   
-                // break; //LD A,D8    2 8     ----
             case 0x3F: CCF(); break;
 
             case 0x40: LD(IncsType.R8_R8, "B", "B"); break;
@@ -148,7 +146,6 @@ public class Instructions
             case 0x45: LD(IncsType.R8_R8, "B", "L"); break;
             case 0x46: LD(IncsType.R8_MAddr, "B", "HL"); break;
             case 0x47: LD(IncsType.R8_R8, "B", "A"); break;
-                                                
             case 0x48: LD(IncsType.R8_R8, "C", "B");break;
             case 0x49: LD(IncsType.R8_R8, "C", "C");break;
             case 0x4A: LD(IncsType.R8_R8, "C", "D");break;
@@ -166,7 +163,6 @@ public class Instructions
             case 0x55: LD(IncsType.R8_R8, "D", "L");break;
             case 0x56: LD(IncsType.R8_MAddr, "D", "HL"); break;
             case 0x57: LD(IncsType.R8_R8, "D", "A");break;
-                                                                
             case 0x58: LD(IncsType.R8_R8, "E", "B");break;
             case 0x59: LD(IncsType.R8_R8, "E", "C");break;
             case 0x5A: LD(IncsType.R8_R8, "E", "D");break;
@@ -184,7 +180,6 @@ public class Instructions
             case 0x65: LD(IncsType.R8_R8, "H", "L");break;
             case 0x66: LD(IncsType.R8_MAddr, "H", "HL"); break;
             case 0x67: LD(IncsType.R8_R8, "H", "A");break;
-                                                                
             case 0x68: LD(IncsType.R8_R8, "L", "B");break;
             case 0x69: LD(IncsType.R8_R8, "L", "C");break;
             case 0x6A: LD(IncsType.R8_R8, "L", "D");break;
@@ -202,7 +197,6 @@ public class Instructions
             case 0x75: LD(IncsType.MAddr_R8, "HL", "L"); break;
             case 0x76: HALT(); break;
             case 0x77: LD(IncsType.MAddr_R8, "HL", "A"); break;
-                                                
             case 0x78: LD(IncsType.R8_R8, "A", "B"); break;
             case 0x79: LD(IncsType.R8_R8, "A", "C"); break;
             case 0x7A: LD(IncsType.R8_R8, "A", "D"); break;
@@ -237,7 +231,6 @@ public class Instructions
             case 0x95: SUB(IncsType.R8, "L"); break;
             case 0x96: SUB(IncsType.MAddr); break;
             case 0x97: SUB(IncsType.R8, "A"); break;
-
             case 0x98: SBC(IncsType.R8_R8, "B"); break;
             case 0x99: SBC(IncsType.R8_R8, "C"); break;
             case 0x9A: SBC(IncsType.R8_R8, "D"); break;
@@ -255,7 +248,6 @@ public class Instructions
             case 0xA5: AND(IncsType.R8, "L"); break;
             case 0xA6: AND(IncsType.MAddr); break;
             case 0xA7: AND(IncsType.R8, "A"); break;
-
             case 0xA8: XOR(IncsType.R8, "B"); break;
             case 0xA9: XOR(IncsType.R8, "C"); break;
             case 0xAA: XOR(IncsType.R8, "D"); break;
@@ -273,7 +265,6 @@ public class Instructions
             case 0xB5: OR(IncsType.R8, "L"); break;
             case 0xB6: OR(IncsType.MAddr); break;
             case 0xB7: OR(IncsType.R8, "A"); break;
-
             case 0xB8: CP(IncsType.R8, "B"); break;
             case 0xB9: CP(IncsType.R8, "C"); break;
             case 0xBA: CP(IncsType.R8, "D"); break;
@@ -291,7 +282,6 @@ public class Instructions
             case 0xC5: PUSH("BC");break;
             case 0xC6: ADD(IncsType.R8_D8); break;
             case 0xC7: RST(0x0); break;
-
             case 0xC8: RET(FlagZ); break;
             case 0xC9: RET(true); break;
             case 0xCA: JP(FlagZ); break;
@@ -304,41 +294,26 @@ public class Instructions
             case 0xD0: RET(!FlagC); break;
             case 0xD1: POP("DE"); break;
             case 0xD2: JP(!FlagC); break;
-            //case 0xD3:                                break; //Illegal Opcode
             case 0xD4: CALL(!FlagC); break;
             case 0xD5: PUSH("DE");break;
             case 0xD6: SUB(IncsType.D8); break;
             case 0xD7: RST(0x10); break;
-
             case 0xD8: RET(FlagC); break;
             case 0xD9: RETI(); break;
             case 0xDA: JP(FlagC); break;
-            //case 0xDB:                                break; //Illegal Opcode
             case 0xDC: CALL(FlagC); break;
-            //case 0xDD:                                break; //Illegal Opcode
             case 0xDE: SBC(IncsType.R8_D8); break;
             case 0xDF: RST(0x18); break;
 
             case 0xE0:  LD(IncsType.A8_R8); break;
-                // ushort value1 = (ushort)(0xFF00 + _mmu.Read(PC));
-                // byte value2 = A;
-                // _mmu.Write((ushort)(0xFF00 + _mmu.Read(PC)), A); 
-                // PC += 1;  
-                // break;
             case 0xE1: POP("HL"); break;
             case 0xE2: LD(IncsType.MAddr8_R8); break;
-            //case 0xE3:                                break; //Illegal Opcode
-            //case 0xE4:                                break; //Illegal Opcode
             case 0xE5: PUSH("HL");break;
             case 0xE6: AND(IncsType.D8); break;
             case 0xE7: RST(0x20); break;
-
             case 0xE8: ADD(IncsType.R16_S8);break;
             case 0xE9: JP(true, IncsType.MAddr); break;
             case 0xEA: LD(IncsType.A16_R8);break;
-            //case 0xEB:                                break; //Illegal Opcode
-            //case 0xEC:                                break; //Illegal Opcode
-            //case 0xED:                                break; //Illegal Opcode
             case 0xEE: XOR(IncsType.D8); break;
             case 0xEF: RST(0x28); break;
 
@@ -346,17 +321,13 @@ public class Instructions
             case 0xF1: POP("AF"); break;
             case 0xF2: LD(IncsType.R8_MAddr8);break;
             case 0xF3: DI(); break;
-            //case 0xF4:                                break; //Illegal Opcode
             case 0xF5: PUSH("AF");break;
             case 0xF6: OR(IncsType.D8); break;
             case 0xF7: RST(0x30); break;
-
             case 0xF8: LD(IncsType.R16_R16S8); break;
             case 0xF9: LD(IncsType.R16_R16);break;
             case 0xFA: LD(IncsType.R8_A16);break;
             case 0xFB: EI(); break;
-            //case 0xFC:                                break; //Illegal Opcode
-            //case 0xFD:                                break; //Illegal Opcode
             case 0xFE: CP(IncsType.D8); break;
             case 0xFF: RST(0x38); break;
         }
