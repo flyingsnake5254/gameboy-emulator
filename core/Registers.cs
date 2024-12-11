@@ -11,16 +11,16 @@ public class Registers
         聯合暫存器
     */
     // AF
-    public u16 AF { get { return (u16) (A << 8 | F); } set { A = (u8) (value >> 8); F = (u8) (value & 0xF0); }}
+    public u16 AF { get { return (u16)(A << 8 | F); } set { A = (u8)(value >> 8); F = (u8)(value & 0xF0); } }
 
     // BC
-    public u16 BC { get { return (u16) (B << 8 | C); } set { B = (u8) (value >> 8); C = (u8) (value & 0xF0); }}
+    public u16 BC { get { return (u16)(B << 8 | C); } set { B = (u8)(value >> 8); C = (u8)value; } }
 
     // DE
-    public u16 DE { get { return (u16) (D << 8 | E); } set { D = (u8) (value >> E); C = (u8) (value & 0xF0); }}
+    public u16 DE { get { return (u16)(D << 8 | E); } set { D = (u8)(value >> 8); E = (u8)value; } }
 
     // HL
-    public u16 HL { get { return (u16) (H << 8 | L); } set { H = (u8) (value >> 8); L = (u8) (value & 0xF0); }}
+    public u16 HL { get { return (u16)(H << 8 | L); } set { H = (u8)(value >> 8); L = (u8)value; } }
 
 
     /*

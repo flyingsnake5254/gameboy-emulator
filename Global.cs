@@ -23,4 +23,6 @@ public class Global
         Gameboy Settings
     */
     public static double GAME_SPEED = 1.0; // 遊戲速度
+
+    public static int DEBUG = 0;
 }

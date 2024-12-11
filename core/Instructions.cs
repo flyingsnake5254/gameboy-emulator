@@ -38,46 +38,51 @@ public class Instructions
         this._regs = regs;
         this._mmu = mmu;
     }
+    long mytick = 0;
+    long limit = 120;
 
     public int Execute(u8 opcode)
     {
+        mytick += 1;//{mytick, 0:D10}
         _cycles = 0;
+        // Console.WriteLine($" {opcode, 0:X2} AF:{_regs.AF, 0:X4} BC:{_regs.BC, 0:X4} DE:{_regs.DE, 0:X4} HL:{_regs.HL, 0:X4} PC:{_regs.PC, 0:X4} SP:{_regs.SP, 0:X4} {(_regs.GetFlag(Registers.Flag.Z) ? "Z" : "-")}{(_regs.GetFlag(Registers.Flag.N) ? "N" : "-")}{(_regs.GetFlag(Registers.Flag.H) ? "H" : "-")}{(_regs.GetFlag(Registers.Flag.C) ? "C" : "-")}");
+        // if (mytick == limit)   Console.Read();
         switch(opcode)
         {
             // 0x00 ~ 0x0F
             case 0x00: NOP(); break;
-            case 0x01: LD(IncsType.R16_D16, "BC"); break;
-            case 0x02: LD(IncsType.MAddr_R8, "BC", "A"); break;
+            case 0x01: LD(IncsType.R16_D16, "BC"); ;break;
+            case 0x02: LD(IncsType.MAddr_R8, "BC", "A"); ;break;
             case 0x03: INC(IncsType.R16, "BC"); break;
             case 0x04: INC(IncsType.R8, "B"); break;
             case 0x05: DEC(IncsType.R8, "B"); break;
-            case 0x06: LD(IncsType.R8_D8, "B"); break;
+            case 0x06: LD(IncsType.R8_D8, "B"); ;break;
             case 0x07: RLCA(); break;
-            case 0x08: LD(IncsType.A16_R16); break;
+            case 0x08: LD(IncsType.A16_R16); ;break;
             case 0x09: ADD(IncsType.R16_R16, "BC"); break;
-            case 0x0A: LD(IncsType.R8_MAddr, "A", "BC"); break;
+            case 0x0A: LD(IncsType.R8_MAddr, "A", "BC"); ;break;
             case 0x0B: DEC(IncsType.R16, "BC"); break;
             case 0x0C: INC(IncsType.R8, "C"); break;
             case 0x0D: DEC(IncsType.R8, "C"); break;
-            case 0x0E: LD(IncsType.R8_D8, "C"); break;
+            case 0x0E: LD(IncsType.R8_D8, "C"); ;break;
             case 0x0F: RRCA(); break;
 
             // 0x10 ~ 0x1F
             case 0x10: STOP(); break;
-            case 0x11: LD(IncsType.R16_D16, "DE"); break;
-            case 0x12: LD(IncsType.MAddr_R8, "DE", "A"); break;
+            case 0x11: LD(IncsType.R16_D16, "DE"); ;break;
+            case 0x12: LD(IncsType.MAddr_R8, "DE", "A"); ;break;
             case 0x13: INC(IncsType.R16, "DE"); break;
             case 0x14: INC(IncsType.R8, "D"); break;
             case 0x15: DEC(IncsType.R8, "D"); break;
-            case 0x16: LD(IncsType.R8_D8, "D"); break;
+            case 0x16: LD(IncsType.R8_D8, "D"); ;break;
             case 0x17: RLA(); break;
             case 0x18: JR(true); break;
             case 0x19: ADD(IncsType.R16_R16, "DE"); break;
-            case 0x1A: LD(IncsType.R8_MAddr, "A", "DE"); break;
+            case 0x1A: LD(IncsType.R8_MAddr, "A", "DE"); ;break;
             case 0x1B: DEC(IncsType.R16, "DE"); break;
             case 0x1C: INC(IncsType.R8, "E"); break;
             case 0x1D: DEC(IncsType.R8, "E"); break;
-            case 0x1E: LD(IncsType.R8_D8, "E"); break;
+            case 0x1E: LD(IncsType.R8_D8, "E"); ;break;
             case 0x1F: RRA(); break;
 
             // 0x20 ~ 0x2F
@@ -113,7 +118,11 @@ public class Instructions
             case 0x3B: DEC(IncsType.R16, "SP"); break;
             case 0x3C: INC(IncsType.R8, "A"); break;
             case 0x3D: DEC(IncsType.R8, "A"); break;
-            case 0x3E: LD(IncsType.R8_D8, "A"); break;
+            case 0x3E: 
+                // _regs.A = _mmu.Read(_regs.PC);
+                // _regs.PC += 1;
+                LD(IncsType.R8_D8, "A"); 
+                break;
             case 0x3F: CCF(); break;
 
             // 0x40 ~ 0x4F
@@ -341,7 +350,9 @@ public class Instructions
 
         if (_ime)
         {
-            PUSH("", IncsType.NO_CYCLE, _regs.PC);
+            _regs.SP -= 2;
+            _mmu.WriteROM16(_regs.SP, _regs.PC);
+            // PUSH("", IncsType.NO_CYCLE, _regs.PC);
             _regs.PC = (u16) (0x40 + (8 * value));
             _ime = false;
 
@@ -1167,6 +1178,8 @@ public class Instructions
         }
         else if (incsType == IncsType.R8_D8)
         {
+            u16 t1 = _regs.PC;
+            u8 t2 = _mmu.Read( _regs.PC);
             switch (data1)
             {
                 case "B": _regs.B = _mmu.Read(_regs.PC ++); break;
@@ -1177,6 +1190,7 @@ public class Instructions
                 case "L": _regs.L = _mmu.Read(_regs.PC ++); break;
                 case "A": _regs.A = _mmu.Read(_regs.PC ++); break;
             }
+            u8 t3 = _regs.A;
             _cycles += 8;
         }
         else if (incsType == IncsType.A16_R16)
@@ -1226,6 +1240,7 @@ public class Instructions
                 case "D": value = _regs.D; break;
                 case "E": value = _regs.E; break;
                 case "L": value = _regs.L; break;
+                case "H": value = _regs.H; break;
             }
 
             switch (data1)
@@ -1474,7 +1489,7 @@ public class Instructions
         _cycles += 4;
     }
     private void STOP() {
-        throw new NotImplementedException();
+        _cycles += 4;
     }
 
     private void RLA()
@@ -1483,6 +1498,7 @@ public class Instructions
         _regs.F = 0;
         _regs.SetFlag(Registers.Flag.C, ((_regs.A & 0x80) != 0));
         _regs.A = (u8) ((_regs.A << 1) | (oldC ? 1 : 0));
+        _cycles += 4;
     }
 
     private void JR(bool state)
@@ -1577,8 +1593,9 @@ public class Instructions
             _regs.SetFlag(Registers.Flag.N, false);
             if (_regs.GetFlag(Registers.Flag.C)) { _regs.SetFlagH(_regs.A, value, Registers.FlagH.Carry); }
             else { _regs.SetFlagH(_regs.A, value); }
-            _regs.SetFlagC(_regs.A + value + (_regs.GetFlag(Registers.Flag.C) ? 1 : 0));
             _regs.A = (u8) (_regs.A + value + (_regs.GetFlag(Registers.Flag.C) ? 1 : 0));
+            _regs.SetFlagC(_regs.A + value + (_regs.GetFlag(Registers.Flag.C) ? 1 : 0));
+            
             _cycles += 4;
         }
         else if (incsType == IncsType.R8_MAddr)
@@ -1588,8 +1605,8 @@ public class Instructions
             _regs.SetFlag(Registers.Flag.N, false);
             if (_regs.GetFlag(Registers.Flag.C)) { _regs.SetFlagH(_regs.A, value, Registers.FlagH.Carry); }
             else { _regs.SetFlagH(_regs.A, value); }
-            _regs.SetFlagC(_regs.A + value + (_regs.GetFlag(Registers.Flag.C) ? 1 : 0));
             _regs.A = (u8) (_regs.A + value + (_regs.GetFlag(Registers.Flag.C) ? 1 : 0));
+            _regs.SetFlagC(_regs.A + value + (_regs.GetFlag(Registers.Flag.C) ? 1 : 0));
             _cycles += 8;
         }
         else if (incsType == IncsType.R8_D8)
@@ -1599,8 +1616,8 @@ public class Instructions
             _regs.SetFlag(Registers.Flag.N, false);
             if (_regs.GetFlag(Registers.Flag.C)) { _regs.SetFlagH(_regs.A, value, Registers.FlagH.Carry); }
             else { _regs.SetFlagH(_regs.A, value); }
-            _regs.SetFlagC(_regs.A + value + (_regs.GetFlag(Registers.Flag.C) ? 1 : 0));
             _regs.A = (u8) (_regs.A + value + (_regs.GetFlag(Registers.Flag.C) ? 1 : 0));
+            _regs.SetFlagC(_regs.A + value + (_regs.GetFlag(Registers.Flag.C) ? 1 : 0));
             _cycles += 8;
         }
     }
@@ -1669,8 +1686,8 @@ public class Instructions
             _regs.SetFlag(Registers.Flag.N, true);
             if (_regs.GetFlag(Registers.Flag.C)) { _regs.SetFlagH(_regs.A, value, Registers.FlagH.SubCarry); }
             else { _regs.SetFlagH(_regs.A, value, Registers.FlagH.Sub); }
-            _regs.SetFlagC(_regs.A - value - (_regs.GetFlag(Registers.Flag.C) ? 1 : 0));
             _regs.A = (u8) (_regs.A - value - (_regs.GetFlag(Registers.Flag.C) ? 1 : 0));
+            _regs.SetFlagC(_regs.A - value - (_regs.GetFlag(Registers.Flag.C) ? 1 : 0));
             _cycles += 4;
         }
         else if (incsType == IncsType.R8_MAddr)
@@ -1681,8 +1698,8 @@ public class Instructions
             _regs.SetFlag(Registers.Flag.N, true);
             if (_regs.GetFlag(Registers.Flag.C)) { _regs.SetFlagH(_regs.A, value, Registers.FlagH.SubCarry); }
             else { _regs.SetFlagH(_regs.A, value, Registers.FlagH.Sub); }
-            _regs.SetFlagC(_regs.A - value - (_regs.GetFlag(Registers.Flag.C) ? 1 : 0));
             _regs.A = (u8) (_regs.A - value - (_regs.GetFlag(Registers.Flag.C) ? 1 : 0));
+            _regs.SetFlagC(_regs.A - value - (_regs.GetFlag(Registers.Flag.C) ? 1 : 0));
             _cycles += 8;
         }
         else if (incsType == IncsType.R8_D8)
@@ -1693,8 +1710,8 @@ public class Instructions
             _regs.SetFlag(Registers.Flag.N, true);
             if (_regs.GetFlag(Registers.Flag.C)) { _regs.SetFlagH(_regs.A, value, Registers.FlagH.SubCarry); }
             else { _regs.SetFlagH(_regs.A, value, Registers.FlagH.Sub); }
-            _regs.SetFlagC(_regs.A - value - (_regs.GetFlag(Registers.Flag.C) ? 1 : 0));
             _regs.A = (u8) (_regs.A - value - (_regs.GetFlag(Registers.Flag.C) ? 1 : 0));
+            _regs.SetFlagC(_regs.A - value - (_regs.GetFlag(Registers.Flag.C) ? 1 : 0));
             _cycles += 8;
         }
     }
@@ -1785,7 +1802,7 @@ public class Instructions
         }
         else if (incsType == IncsType.D8)
         {
-            u8 value = _mmu.Read(_regs.PC);
+            u8 value = _mmu.Read(_regs.PC ++);
 
             _regs.A = (u8) (_regs.A ^ value);
             _regs.SetFlagZ(_regs.A);
@@ -1896,7 +1913,7 @@ public class Instructions
             case "HL": _regs.HL = value; break;
             case "AF": _regs.AF = value; break;
         }
-        _cycles += 12;
+        if (data1 != "") _cycles += 12;
         return value;
     }
 
@@ -1940,7 +1957,8 @@ public class Instructions
     {
         if (incsType == IncsType.A16)
         {
-            if (flag) { _regs.PC = _mmu.ReadROM16(_regs.PC); _cycles += 16; }
+            if (flag) 
+            { _regs.PC = _mmu.ReadROM16(_regs.PC); _cycles += 16; }
             else { _regs.PC += 2; _cycles += 12; }
         }
         else if (incsType == IncsType.MAddr)
