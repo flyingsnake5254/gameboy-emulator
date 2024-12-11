@@ -22,14 +22,6 @@ public class CPU
 
     public int Step()
     {
-        
-        
-        // for (int i = 0x00 ; i <= 0xFF ; i ++)
-        // {
-        //     Console.WriteLine($"{i, 0:X2} - {_insc.Execute((u8)i)}");
-        // }
-        // Console.Read();
-        // u8 opcode = _mmu.Read(Regs.PC ++);
         int temp = _insc.Step();
         return temp;
     }
